@@ -4,7 +4,6 @@ import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
-import playwrightPlugin from 'eslint-plugin-playwright';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import prettier from 'eslint-config-prettier/flat';
 
@@ -29,16 +28,16 @@ const eslintConfig = defineConfig([
         { props: 'never', children: 'never' },
       ],
       'react/self-closing-comp': ['error', { component: true, html: true }],
-      
+
       // React Hooks rules
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      
+
       // Next.js custom rules
       '@next/next/no-img-element': 'off',
       '@next/next/no-page-custom-font': 'off',
       '@next/next/no-duplicate-head': 'off',
-      
+
       // Accessibility rules (jsx-a11y is already included in nextVitals)
       'jsx-a11y/alt-text': 'off', // Handled by Next.js Image component
       'jsx-a11y/heading-has-content': 'off', // Allow empty headings
@@ -61,18 +60,12 @@ const eslintConfig = defineConfig([
             ['^react(-|\\/|$)', '^next(-|\\/|$)', '^@next(-|\\/|$)'],
             // 2. Other third-party packages
             ['^@?\\w'],
-            // 3. `@ui` imports
-            ['^@ui(-|\\/|$)'],
             // 4. `@/components` imports
             ['^@/components'],
             // 5. `@/app` imports
             ['^@/app'],
-            // 6. `@/store` imports
-            ['^@/store'],
             // 7. `@/lib` imports
             ['^@/lib'],
-            // 8. `@assets` imports
-            ['^@assets(-|\\/|$)'],
             // 9. Other absolute imports
             ['^@/'],
             // 10. Relative imports
@@ -187,26 +180,6 @@ const eslintConfig = defineConfig([
       'no-var': 'error',
       'arrow-body-style': ['error', 'as-needed'],
       'object-shorthand': ['error', 'always'],
-    },
-  },
-
-  // Playwright test files
-  {
-    files: ['**/*.test.{js,jsx,ts,tsx}', '**/__tests__/**/*.{js,jsx,ts,tsx}'],
-    plugins: {
-      playwright: playwrightPlugin,
-    },
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-    },
-  },
-
-  // Special files overrides
-  {
-    files: ['src/iconify-bundle/*'],
-    rules: {
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-var-requires': 'off',
     },
   },
 
