@@ -1,147 +1,595 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'lenis/dist/lenis.css';
 
-@theme inline {
+/*
+ * Jaylead AgriEstate, v3: "a cinematic land register". Bone paper and the
+ * logo's deep green (no black anywhere), with the logo's sun as the accent:
+ * palm-oil orange on light, harvest gold on green. See docs/design-direction.md.
+ * Contrast ratios are WCAG, computed against the token named.
+ */
+@theme {
+  --color-bone: #f1ecdf; /* page ground */
+  --color-bone-deep: #e6dfcd; /* alternate bands */
+  --color-ink: #0d3924; /* logo green-900: text and dark surfaces. 10.9:1 on bone */
+  --color-moss: #046647; /* logo green-700. 5.9:1 on bone */
+  --color-stone: #55655a; /* 5.2:1 on bone, 4.7:1 on bone-deep */
+  --color-sand: #c9d3c4; /* 8.4:1 on green: secondary text on dark */
+  --color-mist: #9fb3a4; /* 5.8:1 on green: captions on dark */
+  /* The one accent. Italic emphasis, active states, hover. Never a big fill. */
+  --color-oil: #a63d17; /* palm-oil orange, 5.4:1 on bone */
+  --color-oil-light: #fdcb32;
+  --color-sun: #fdcb32; /* the logo's gold: play buttons. Ink on it 8.5:1 */ /* the logo's gold, 8.5:1 on green */
+  --color-alert: #a3261b; /* form errors, 6.2:1 on bone */
+  --color-rule: color-mix(in oklab, #0d3924 18%, transparent);
+  --color-rule-light: color-mix(in oklab, #f1ecdf 20%, transparent);
 
-  --font-satoshi: var(--font-satoshi);
-  --font-inter: var(--font-inter);
-  --font-k2d: var(--font-k2d);
+  --font-display: var(--font-slab), 'Rockwell', Georgia, serif;
+  --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
 
-  --color-secondary-one: #114e50;
-  --color-secondary-two: #6e9394;
-  --color-accented: #ffb441;
-  --color-secondary-base: #023526;
-  --color-tetiary-text: #454545;
-  --color-quote-background: #f6f1fb;
-  --color-qoute-text: #5b0abf;
-  --color-ongoing-background: #d9f5f8;
-  --color-ongoing-text: #36dcee;
-  --color-pending-background: #f9e8cc;
-  --color-pending-text: #eaa337;
-  --color-divider: #f3f3f3;
-  --color-button-background:#FFEED4;
+  --text-hero: clamp(2.75rem, 6.6vw, 6.75rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.03em;
+  --text-display: clamp(2.125rem, 4.4vw, 4.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.025em;
+  --text-title: clamp(1.875rem, 3.2vw, 3rem);
+  --text-title--line-height: 1.04;
+  --text-title--letter-spacing: -0.02em;
+  --text-statement: clamp(1.75rem, 3.6vw, 3.5rem);
+  --text-statement--line-height: 1.12;
+  --text-statement--letter-spacing: -0.02em;
+  --text-figure: clamp(2rem, 4vw, 3.75rem);
+  --text-figure--line-height: 1;
+  --text-lede: clamp(1.125rem, 1.4vw, 1.3125rem);
+  --text-lede--line-height: 1.55;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.55;
+  --text-micro: 0.6875rem; /* 11px caps */
+  --text-micro--line-height: 1.3;
+  --text-micro--letter-spacing: 0.18em;
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.25);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.216 0.006 56.043);
-  --primary-foreground: oklch(0.985 0.001 106.423);
-  --secondary: oklch(0.97 0.001 106.424);
-  --secondary-foreground: oklch(0.216 0.006 56.043);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.97 0.001 106.424);
-  --accent-foreground: oklch(0.216 0.006 56.043);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0.001 106.423);
-  --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --sidebar-primary: oklch(0.216 0.006 56.043);
-  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.97 0.001 106.424);
-  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
-}
-
-.dark {
-  --background: oklch(0.147 0.004 49.25);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.923 0.003 48.717);
-  --primary-foreground: oklch(0.216 0.006 56.043);
-  --secondary: oklch(0.268 0.007 34.298);
-  --secondary-foreground: oklch(0.985 0.001 106.423);
-  --muted: oklch(0.268 0.007 34.298);
-  --muted-foreground: oklch(0.709 0.01 56.259);
-  --accent: oklch(0.268 0.007 34.298);
-  --accent-foreground: oklch(0.985 0.001 106.423);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.553 0.013 58.071);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.216 0.006 56.043);
-  --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.268 0.007 34.298);
-  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.553 0.013 58.071);
+  --dur-press: 120ms;
+  --dur-hover: 240ms;
+  --dur-reveal: 1000ms;
+  --gutter: clamp(1.25rem, 4.5vw, 4.5rem);
+  --header-h: 4.5rem;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    background: var(--color-bone);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
   body {
-    @apply bg-background text-foreground;
+    background: var(--color-bone);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-variant-numeric: lining-nums;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  [id] {
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--color-oil);
+    outline-offset: 4px;
+  }
+
+  .on-ink :focus-visible {
+    outline-color: var(--color-oil-light);
+  }
+
+  ::selection {
+    background: var(--color-oil);
+    color: var(--color-bone);
+  }
+
+  summary {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/* Bespoke Slab is pinned to 700 per style; lining figures for prices. */
+@utility font-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+/* Italic emphasis inside display type, in the logo's sun colours. */
+@utility em-oil {
+  font-style: italic;
+  color: var(--color-oil);
+
+  .on-ink & {
+    color: var(--color-oil-light);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility micro {
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+@utility measure {
+  max-width: 62ch;
+}
+
+@utility grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Buttons: one pill, same words everywhere ───────────────────────── */
+@utility pill {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: 999px;
+  padding-inline: 1.6rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: var(--color-ink);
+  color: var(--color-bone);
+  transition:
+    background-color var(--dur-hover) var(--ease-out-expo),
+    color var(--dur-hover) var(--ease-out-expo),
+    box-shadow var(--dur-hover) var(--ease-out-expo),
+    transform var(--dur-press) ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--color-moss);
+    }
+  }
+
+  .on-ink & {
+    background: var(--color-oil-light);
+    color: var(--color-ink);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-bone);
+      }
+    }
+  }
+}
+
+@utility pill-ghost {
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-rule);
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--color-ink);
+      color: var(--color-bone);
+    }
+  }
+
+  .on-ink & {
+    background: transparent;
+    color: var(--color-bone);
+    box-shadow: inset 0 0 0 1px var(--color-rule-light);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-bone);
+        color: var(--color-ink);
+      }
+    }
+  }
+}
+
+/* Inline text links: always underlined (not colour alone), thicker on hover. */
+@utility link-under {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color var(--dur-hover) ease;
+
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* Underline that draws in from the left. */
+@utility link-draw {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.1em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 500ms var(--ease-out-expo);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+@utility arrow-nudge {
+  display: inline-block;
+  transition: transform var(--dur-hover) var(--ease-out-expo);
+
+  .group:hover & {
+    transform: translateX(0.3em);
+  }
+}
+
+/* ── Prose (Portable Text, legal pages, posts) ─────────────────────── */
+.prose {
+  max-width: 66ch;
+  color: var(--color-moss);
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2 {
+  margin-top: 2.2em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-title);
+  line-height: var(--text-title--line-height);
+  letter-spacing: var(--text-title--letter-spacing);
+  color: var(--color-ink);
+}
+
+.prose h3 {
+  margin-top: 1.8em;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--color-ink);
+}
+
+.prose ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose ul > li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.6rem;
+  height: 1px;
+  background: var(--color-oil);
+}
+
+.prose ol {
+  list-style: decimal-leading-zero;
+  padding-left: 2rem;
+}
+
+.prose li + li {
+  margin-top: 0.5em;
+}
+
+.prose a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-oil);
+  text-underline-offset: 0.22em;
+}
+
+.prose blockquote {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: var(--text-title);
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+.prose strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+.prose th,
+.prose td {
+  border-bottom: 1px solid var(--color-rule);
+  padding: 0.7rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* ── FAQ (native details) ──────────────────────────────────────────── */
+.faq-item .faq-mark {
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+.faq-item[open] .faq-mark {
+  transform: rotate(45deg);
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+/* Mobile menu: a <details> panel below the header, CSS only. */
+.mobile-menu[open] > .mobile-menu-panel {
+  animation: menu-in 700ms var(--ease-out-expo) both;
+}
+
+.mobile-menu[open] .menu-link {
+  animation: menu-rise 900ms var(--ease-out-expo) calc(150ms + var(--i) * 55ms)
+    both;
+}
+
+html:has(.mobile-menu[open]) {
+  overflow: hidden;
+}
+
+@keyframes menu-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes menu-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45%);
+  }
+}
+
+/* ── Video facades ─────────────────────────────────────────────────── */
+.reel-frame {
+  --embed-h: 84svh;
+  --embed-w: clamp(
+    20.375rem,
+    min(92vw, (var(--embed-h) - 208px) / 1.25),
+    33.75rem
+  );
+
+  width: var(--embed-w);
+  height: calc(var(--embed-w) * 1.25 + 208px);
+}
+
+.reel-frame[data-platform='tiktok'] {
+  width: min(92vw, 20.5rem);
+  height: min(84svh, 46rem);
+}
+
+.reel-frame[data-platform='youtube'] {
+  width: min(92vw, 60rem);
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+dialog.reel-dialog,
+dialog.aerial-dialog {
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+dialog.reel-dialog::backdrop,
+dialog.aerial-dialog::backdrop {
+  background: color-mix(in oklab, var(--color-ink) 94%, transparent);
+}
+
+/* ── Load choreography: pure CSS, plays with JS off ─────────────────── */
+.split-word {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  /* Room for descenders (g, y, p) inside the mask at display line-heights. */
+  padding-block: 0.06em 0.3em;
+  margin-block: -0.06em -0.3em;
+}
+
+.split-word > span {
+  display: inline-block;
+  animation: word-rise 1200ms var(--ease-out-expo) calc(var(--i) * 70ms + 100ms)
+    both;
+}
+
+@keyframes word-rise {
+  from {
+    transform: translateY(115%) rotate(4deg);
+  }
+}
+
+.load-fade {
+  animation: fade-up 1000ms var(--ease-out-expo)
+    calc(var(--i, 0) * 90ms + 500ms) both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* ── Scroll scenes: native layout until the runtime takes over ─────── */
+[data-motion-rail] {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+[data-motion-rail]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-motion-track] {
+  position: relative;
+  display: flex;
+  width: max-content;
+}
+
+[data-motion-item] {
+  scroll-snap-align: start;
+}
+
+[data-motion-pinned] {
+  overflow: clip;
+}
+
+[data-motion-pinned] [data-motion-rail] {
+  overflow: visible;
+  scroll-snap-type: none;
+}
+
+/* Hero field: a flat block under the copy until the scene arms it; then the
+   hero is one viewport and the aerial lies as a floor along its bottom. */
+[data-field-armed] {
+  height: 100svh;
+  min-height: 36rem;
+}
+
+[data-field-armed] [data-field-wrap] {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  z-index: 0;
+}
+
+[data-field-armed] [data-field-copy] {
+  position: relative;
+  z-index: 1;
+}
+
+[data-field-armed] [data-field-plane] {
+  height: 100%;
+  max-width: none;
+}
+
+[data-field-armed] [data-field-plane] a,
+[data-field-armed] [data-field-plane] figure,
+[data-field-armed] [data-field-plane] figure > div {
+  height: 100%;
+}
+
+[data-field-armed] [data-field-plane] figure > div {
+  aspect-ratio: auto !important;
+}
+
+/* 3D stages: flat by default; scenes add the depth on the client. */
+.stage-3d {
+  perspective: 1400px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Marquee: two identical sets, the second aria-hidden, travelling -50%. */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 70s linear infinite;
+}
+
+.marquee:hover,
+.marquee:focus-within {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Scroll progress: zero JS where supported. */
+.scroll-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    transform-origin: 0 50%;
+    animation: progress linear both;
+    animation-timeline: scroll(root);
+  }
+
+  @keyframes progress {
+    from {
+      transform: scaleX(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .split-word > span,
+  .load-fade,
+  .marquee,
+  .mobile-menu[open] > .mobile-menu-panel,
+  .mobile-menu[open] .menu-link {
+    animation: none;
   }
 }

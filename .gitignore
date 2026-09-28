@@ -41,3 +41,15 @@ yarn-error.log*
 next-env.d.ts
 
 
+!.env.example
+
+# Source material and build notes: not used by `next build` or the live site.
+# The media the site ships is already processed into public/ and src/app/.
+/jaylead_ng/
+/jaylead_ng-site-build-brief.md
+/playbook/
+/docs
+
+# local tooling output
+/.staging
+/.playwright-mcp
