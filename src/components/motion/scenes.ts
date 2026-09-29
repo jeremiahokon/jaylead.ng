@@ -14,6 +14,17 @@ export type Scene = {
   run: (el: HTMLElement, t: Tools, c: Conditions) => void | (() => void);
 };
 
+/**
+ * The server-rendered <div data-pin-spacer> around a pinned section. Handing
+ * it to ScrollTrigger stops it wrapping the section in a spacer of its own:
+ * that DOM move makes WebKit cancel and restart every CSS animation inside,
+ * so the hero headline would rise a second time.
+ */
+const spacer = (el: HTMLElement) =>
+  el.parentElement?.hasAttribute('data-pin-spacer')
+    ? el.parentElement
+    : undefined;
+
 export const scenes = {
   /**
    * Hero. <section data-scene="field"> with [data-field-copy] and
@@ -65,6 +76,7 @@ export const scenes = {
           start: 'top top',
           end: () => `+=${innerHeight * (c.desktop ? 1.3 : 0.9)}`,
           pin: true,
+          pinSpacer: spacer(el),
           scrub: 0.9,
           anticipatePin: 1,
           invalidateOnRefresh: true,
@@ -130,6 +142,7 @@ export const scenes = {
         scrollTrigger: {
           trigger: el,
           pin: true,
+          pinSpacer: spacer(el),
           scrub: 1,
           start: 'top top',
           end: () => `+=${distance() * (c.desktop ? 1 : 1.2)}`,

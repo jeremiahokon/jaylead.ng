@@ -164,111 +164,118 @@ export default async function Home() {
       />
 
       {/* Hero: the promise, then the land rising into view (scene "field"). */}
-      <section data-scene="field" className="relative overflow-hidden">
-        <div
-          data-field-copy
-          className="mx-auto max-w-[96rem] px-(--gutter) pt-8 md:pt-12"
-        >
+      <div data-pin-spacer>
+        <section data-scene="field" className="relative overflow-hidden">
           <div
-            className="micro load-fade flex flex-wrap justify-between gap-x-8 gap-y-2 opacity-80"
-            style={{ '--i': 0 } as React.CSSProperties}
+            data-field-copy
+            className="mx-auto max-w-[96rem] px-(--gutter) pt-8 md:pt-12"
           >
-            <p>
-              {estate?.name ?? 'Palm Grove Estate'} ·{' '}
-              {estate?.state ?? 'Osun State'}
-            </p>
-            <p className="tabular">
-              {fromPrice ? `From ${utils.format.naira(fromPrice)} · ` : ''}Palm
-              oil income from year 3
+            <div
+              className="micro load-fade flex flex-wrap justify-between gap-x-8 gap-y-2 opacity-80"
+              style={{ '--i': 0 } as React.CSSProperties}
+            >
+              <p>
+                {estate?.name ?? 'Palm Grove Estate'} ·{' '}
+                {estate?.state ?? 'Osun State'}
+              </p>
+              <p className="tabular">
+                {fromPrice ? `From ${utils.format.naira(fromPrice)} · ` : ''}
+                Palm oil income from year 3
+              </p>
+            </div>
+            <h1 className="font-display mt-8 text-[clamp(2.6rem,6.3vw,7rem)] leading-[0.95] tracking-[-0.03em] md:mt-10">
+              <SplitWords
+                parts={[
+                  { text: 'Own titled farmland.', breakAfter: true },
+                  {
+                    text: 'We farm it.',
+                    className: 'em-oil',
+                    breakAfter: true,
+                  },
+                  { text: 'You earn from the harvest.' },
+                ]}
+              />
+            </h1>
+            <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
+              <p
+                className="text-lede measure load-fade opacity-85"
+                style={{ '--i': 2 } as React.CSSProperties}
+              >
+                Palm Grove Estate, Osun State: titled oil-palm plots
+                {fromPrice ? ` from ${utils.format.naira(fromPrice)}` : ''},
+                planted and fully managed by Jaylead. Palm oil income from year
+                3.
+              </p>
+              <div
+                className="load-fade"
+                style={{ '--i': 3 } as React.CSSProperties}
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <WhatsAppLink template="brochure" magnetic>
+                    Get the brochure on WhatsApp
+                  </WhatsAppLink>
+                  {estate?.brochureUrl ? (
+                    <a
+                      href={estate.brochureUrl}
+                      download
+                      className="pill pill-ghost"
+                    >
+                      Download PDF
+                      {estate.brochureSizeLabel
+                        ? ` (${estate.brochureSizeLabel})`
+                        : ''}
+                    </a>
+                  ) : null}
+                </div>
+                <ReplyNote className="mt-4" />
+              </div>
+            </div>
+            <p
+              className="micro load-fade mt-8 flex flex-wrap gap-x-6 gap-y-2 opacity-70"
+              style={{ '--i': 4 } as React.CSSProperties}
+            >
+              {trustLine.map((t) => (
+                <span key={t}>{t}</span>
+              ))}
+              <a href="#land-vs-shares" className="link-under text-oil">
+                How land compares to shares
+              </a>
             </p>
           </div>
-          <h1 className="font-display mt-8 text-[clamp(2.6rem,6.3vw,7rem)] leading-[0.95] tracking-[-0.03em] md:mt-10">
-            <SplitWords
-              parts={[
-                { text: 'Own titled farmland.', breakAfter: true },
-                { text: 'We farm it.', className: 'em-oil', breakAfter: true },
-                { text: 'You earn from the harvest.' },
-              ]}
-            />
-          </h1>
-          <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
-            <p
-              className="text-lede measure load-fade opacity-85"
-              style={{ '--i': 2 } as React.CSSProperties}
-            >
-              Palm Grove Estate, Osun State: titled oil-palm plots
-              {fromPrice ? ` from ${utils.format.naira(fromPrice)}` : ''},
-              planted and fully managed by Jaylead. Palm oil income from year 3.
-            </p>
-            <div
-              className="load-fade"
-              style={{ '--i': 3 } as React.CSSProperties}
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <WhatsAppLink template="brochure" magnetic>
-                  Get the brochure on WhatsApp
-                </WhatsAppLink>
-                {estate?.brochureUrl ? (
-                  <a
-                    href={estate.brochureUrl}
-                    download
-                    className="pill pill-ghost"
+
+          <div data-field-wrap className="stage-3d mt-14 md:mt-20">
+            <div data-field-plane className="relative mx-auto max-w-[110rem]">
+              <AerialPlayer
+                src={aerialSrc}
+                poster={images['aerial-fields'].src}
+                className="group relative block"
+              >
+                <Photo
+                  image={images['aerial-fields']}
+                  sizes="100vw"
+                  priority
+                  aspect={16 / 8}
+                  className="overflow-hidden"
+                />
+                <span
+                  data-field-veil
+                  aria-hidden
+                  className="bg-ink pointer-events-none absolute inset-0 opacity-15"
+                />
+                <span className="from-ink/70 absolute inset-x-0 bottom-0 flex flex-col items-start gap-4 bg-gradient-to-t to-transparent p-5 pt-16 sm:flex-row sm:items-end sm:justify-between md:p-10">
+                  <span
+                    data-field-caption
+                    className="micro text-bone max-w-[22ch] leading-relaxed"
                   >
-                    Download PDF
-                    {estate.brochureSizeLabel
-                      ? ` (${estate.brochureSizeLabel})`
-                      : ''}
-                  </a>
-                ) : null}
-              </div>
-              <ReplyNote className="mt-4" />
+                    Jaylead farmland from the air, September 2026
+                  </span>
+                  <WatchPill />
+                </span>
+              </AerialPlayer>
             </div>
           </div>
-          <p
-            className="micro load-fade mt-8 flex flex-wrap gap-x-6 gap-y-2 opacity-70"
-            style={{ '--i': 4 } as React.CSSProperties}
-          >
-            {trustLine.map((t) => (
-              <span key={t}>{t}</span>
-            ))}
-            <a href="#land-vs-shares" className="link-under text-oil">
-              How land compares to shares
-            </a>
-          </p>
-        </div>
-
-        <div data-field-wrap className="stage-3d mt-14 md:mt-20">
-          <div data-field-plane className="relative mx-auto max-w-[110rem]">
-            <AerialPlayer
-              src={aerialSrc}
-              poster={images['aerial-fields'].src}
-              className="group relative block"
-            >
-              <Photo
-                image={images['aerial-fields']}
-                sizes="100vw"
-                priority
-                aspect={16 / 8}
-                className="overflow-hidden"
-              />
-              <span
-                data-field-veil
-                aria-hidden
-                className="bg-ink pointer-events-none absolute inset-0 opacity-15"
-              />
-              <span className="from-ink/70 absolute inset-x-0 bottom-0 flex flex-col items-start gap-4 bg-gradient-to-t to-transparent p-5 pt-16 sm:flex-row sm:items-end sm:justify-between md:p-10">
-                <span
-                  data-field-caption
-                  className="micro text-bone max-w-[22ch] leading-relaxed"
-                >
-                  Jaylead farmland from the air, September 2026
-                </span>
-                <WatchPill />
-              </span>
-            </AerialPlayer>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <Marquee
         items={[
