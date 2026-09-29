@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { LegalPage } from '@/components/legal-page';
 
 import { getSettings } from '@/lib/content';
+import { siteHost } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Terms: Jaylead AgriEstate',
@@ -23,8 +24,8 @@ export default async function Terms() {
       updated="28 September 2026"
     >
       <p>
-        These terms cover your use of www.jayleadagro.com, run by {s.legalName}{' '}
-        (RC {s.rcNumber}).
+        These terms cover your use of {siteHost}, run by {s.legalName} (RC{' '}
+        {s.rcNumber}).
       </p>
       <h2>Information, not an offer</h2>
       <p>

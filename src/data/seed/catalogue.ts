@@ -53,7 +53,6 @@ export const estatesSeed: Estate[] = [
     name: 'Palm Grove Estate',
     slug: 'palm-grove',
     state: 'Osun State',
-    status: 'selling',
     summary:
       'Titled oil-palm farmland in Osun State, planted and fully managed by Jaylead. Buy by the acre or the hectare, receive your documents, and earn from the palm oil your plot produces from year 3.',
     body: pt(
@@ -66,38 +65,6 @@ export const estatesSeed: Estate[] = [
     incomeStartYear: 3,
     productiveLifeText: '25 to 30 years',
     documents: documentsSeed,
-    timeline: [
-      {
-        label: 'Purchase',
-        description:
-          'Choose a 1 acre or 1 hectare plot and pay in full or by instalments.',
-      },
-      {
-        label: 'Documentation',
-        description:
-          'Receive your Deed of Assignment, Certificate of Allocation, Registered Survey and Layout Plan.',
-      },
-      {
-        label: 'Planting',
-        description:
-          'Jaylead clears, prepares and plants your plot with Supergene oil palms.',
-      },
-      {
-        label: 'Maintenance',
-        description:
-          'Weeding, fertilising and care, handled by Jaylead’s agriculture team.',
-      },
-      {
-        label: 'First harvest in year 3',
-        description:
-          'The palms start bearing fruit, which is processed into crude palm oil.',
-      },
-      {
-        label: 'Yearly CPO income',
-        description:
-          'Your share of the palm oil revenue is paid yearly for the productive life of the palms.',
-      },
-    ],
     gallery: [
       images['aerial-fields'],
       images['aerial-perimeter'],

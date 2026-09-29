@@ -21,17 +21,17 @@ export const settingsQuery = defineQuery(`*[_type == "siteSettings"][0]{
   ..., "address": address{..., "mapImage": mapImage${IMG}, "geo": select(defined(geo) => {"lat": geo.lat, "lng": geo.lng})}
 }`);
 
-const DOC = `{ _id, name, plainExplanation, "sampleImage": sampleImage${IMG} }`;
+const DOC = `{ _id, name, plainExplanation }`;
 
 const ESTATE = `{
-  _id, name, "slug": slug.current, state, lga, town, status, summary, body, headlineStats,
+  _id, name, "slug": slug.current, state, lga, town, summary, body, headlineStats,
   "headlineStatsConfirmed": coalesce(headlineStatsConfirmed, false),
   "palmVariety": coalesce(palmVariety, "Supergene"), "incomeStartYear": coalesce(incomeStartYear, 3),
   "productiveLifeText": coalesce(productiveLifeText, "25 to 30 years"),
-  "documents": coalesce(documents[]->${DOC}, []), "timeline": coalesce(timeline, []),
+  "documents": coalesce(documents[]->${DOC}, []),
   "gallery": coalesce(gallery[]${IMG}, []), "heroImage": heroImage${IMG},
   "brochureUrl": brochure.asset->url, "brochureBytes": brochure.asset->size,
-  mapUrl, "mapImage": mapImage${IMG},
+  mapUrl, "aerialFileUrl": aerialFile.asset->url,
   "aerialVideoKey": aerialVideo->url, seo, hidden, "updatedAt": _updatedAt
 }`;
 
@@ -98,11 +98,10 @@ const POST = `{
     _type == "videoRef" => @->{ "_type": "videoRef", "_key": ^._key, url }
   },
   "category": category->{ _id, title, "slug": slug.current, "description": coalesce(description, "") },
-  "estateSlug": estate->slug.current,
   "author": author->{ _id, name, role, "slug": slug.current, "photo": photo${IMG} },
   publishedAt, "updatedAt": _updatedAt,
   "readTime": round(length(pt::text(body)) / 5 / 220) + 1,
-  seo, faq, recordedOn, recordedAt, "relatedPlotSlug": relatedPlot->slug.current
+  seo, faq, recordedOn, recordedAt
 }`;
 
 export const postsQuery = defineQuery(
@@ -112,5 +111,5 @@ export const postsQuery = defineQuery(
 export const videosQuery =
   defineQuery(`*[_type == "videoEmbed" && defined(url)] | order(publishedOn desc) {
   _id, title, url, "poster": poster${IMG}, aspect, duration, summary, publishedOn, account,
-  "featured": coalesce(featured, false), "placements": coalesce(placements, []), "estateSlug": estate->slug.current
+  "placements": coalesce(placements, []), "relatedPostId": relatedPost._ref
 }`);

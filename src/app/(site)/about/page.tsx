@@ -25,6 +25,7 @@ import {
   getVideosFor,
 } from '@/lib/content';
 import { videoNode } from '@/lib/jsonld';
+import { utils } from '@/lib/utils';
 
 import { values } from '@/data/copy';
 import { images } from '@/data/images';
@@ -249,7 +250,7 @@ export default async function About() {
               <span className="em-oil">Tanke, Ilorin.</span>
             </>
           }
-          lede={`${settings.address.line1}, ${settings.address.landmarkDirections}, ${settings.address.city}. Monday to Friday, 9am to 5pm. Come in, meet the team and see the documents for yourself.`}
+          lede={`${settings.address.line1}, ${settings.address.landmarkDirections}, ${settings.address.city}. ${utils.format.hours(settings.officeHours)}. Come in, meet the team and see the documents for yourself.`}
         />
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           <div data-motion="depth" data-motion-depth="0.2">

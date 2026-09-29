@@ -129,6 +129,33 @@ const format = {
       timeZone: 'Africa/Lagos',
     });
   },
+
+  /**
+   * Office hours from Site settings: "Monday to Friday, 9am to 5pm", or
+   * "Mon to Fri, 9am to 5pm" with `short`. Several rows join with "; ".
+   */
+  hours(
+    rows: SiteSettings['officeHours'],
+    { short = false }: { short?: boolean } = {}
+  ): string {
+    const time = (hhmm: string) => {
+      const [h = 0, m = 0] = hhmm.split(':').map(Number);
+      const suffix = h >= 12 ? 'pm' : 'am';
+      const hour = h % 12 || 12;
+
+      return m
+        ? `${hour}:${String(m).padStart(2, '0')}${suffix}`
+        : `${hour}${suffix}`;
+    };
+
+    const days = (d: string) =>
+      short ? d.replace(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*/g, '$1') : d;
+
+    return rows
+      .filter((r) => r.days && r.opens && r.closes)
+      .map((r) => `${days(r.days)}, ${time(r.opens)} to ${time(r.closes)}`)
+      .join('; ');
+  },
 };
 
 /* ── Contact ───────────────────────────────────────────────────────── */

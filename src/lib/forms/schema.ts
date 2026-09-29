@@ -76,7 +76,7 @@ export {
   type FormState,
   type LeadType,
   leadTypes,
-  successCopy,
+  successMessage,
   templateFor,
 } from './fields';
 import { utils } from '@/lib/utils';

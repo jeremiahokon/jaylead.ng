@@ -32,8 +32,8 @@ import { YearsScene } from '@/components/years-scene';
 
 import {
   getDepartments,
-  getEstate,
   getFaqs,
+  getMainEstate,
   getPlots,
   getPosts,
   getSettings,
@@ -42,21 +42,60 @@ import {
   getVideosFor,
 } from '@/lib/content';
 import { faqNode, videoNode } from '@/lib/jsonld';
+import type { Post, Video } from '@/lib/types';
 import { utils } from '@/lib/utils';
 
 import { images } from '@/data/images';
 
 const title = 'Jaylead AgriEstate: Titled Oil Palm Farmland in Osun, Nigeria';
 
-const description =
-  'Own titled oil-palm farmland from ₦4,000,000. We plant and manage it; you earn from the harvest from year 3. CAC registered, RC 9492571.';
+/** Built from the live plots and settings, so a price change in the Studio reaches Google too. */
+async function describe() {
+  const [plots, settings] = await Promise.all([getPlots(), getSettings()]);
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: '/' },
-  openGraph: { title, description, url: '/' },
-};
+  const prices = plots
+    .filter((p) => p.priceMode !== 'on-request')
+    .map((p) => p.price);
+
+  const from = prices.length
+    ? ` from ${utils.format.naira(Math.min(...prices))}`
+    : '';
+
+  return `Own titled oil-palm farmland${from}. We plant and manage it; you earn from the harvest from year 3. CAC registered, RC ${settings.rcNumber}.`;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const description = await describe();
+
+  return {
+    title,
+    description,
+    alternates: { canonical: '/' },
+    openGraph: { title, description, url: '/' },
+  };
+}
+
+/** A field-record video, titled and linked by its related post when set. */
+function ProofCard({ video, post }: { video: Video; post?: Post }) {
+  return (
+    <>
+      <VideoCard
+        video={video}
+        sizes="(min-width: 1024px) 22vw, (min-width: 640px) 50vw, 100vw"
+        showSummary={false}
+        meta={utils.format.date(video.publishedOn ?? '')}
+      />
+      {post ? (
+        <Link
+          href={`/blog/${post.slug}`}
+          className="font-display mt-2 block text-xl leading-snug"
+        >
+          {post.title}
+        </Link>
+      ) : null}
+    </>
+  );
+}
 
 export default async function Home() {
   const [
@@ -72,7 +111,7 @@ export default async function Home() {
     departments,
   ] = await Promise.all([
     getSettings(),
-    getEstate('palm-grove'),
+    getMainEstate(),
     getPlots(),
     getPosts(),
     getFaqs(),
@@ -90,10 +129,20 @@ export default async function Home() {
     ? Math.min(...priced.map((p) => p.price))
     : undefined;
 
-  const homeFaqs = faqs.filter((f) => f.showOnHome);
+  const description = await describe();
+  const aerialSrc = estate?.aerialFileUrl ?? '/video/aerial.mp4';
+
+  // Never an empty Questions section: fall back to the first six.
+  const picked = faqs.filter((f) => f.showOnHome);
+  const homeFaqs = picked.length ? picked : faqs.slice(0, 6);
   const founderVideo = founder[0];
-  const soil = proof.find((v) => v.key === 'instagram:DdJx-XQqgvp');
-  const onSite = proof.find((v) => v.key === 'instagram:DdD4lwIummX');
+
+  // Field record: the newest two "proof-strip" videos, each linking to its
+  // related post when one is set.
+  const [firstProof, secondProof] = proof.slice(0, 2).map((video) => ({
+    video,
+    post: posts.find((p) => p._id === video.relatedPostId),
+  }));
 
   const trustLine = [
     ...creds.map((c) =>
@@ -115,111 +164,118 @@ export default async function Home() {
       />
 
       {/* Hero: the promise, then the land rising into view (scene "field"). */}
-      <section data-scene="field" className="relative overflow-hidden">
-        <div
-          data-field-copy
-          className="mx-auto max-w-[96rem] px-(--gutter) pt-8 md:pt-12"
-        >
+      <div data-pin-spacer>
+        <section data-scene="field" className="relative overflow-hidden">
           <div
-            className="micro load-fade flex flex-wrap justify-between gap-x-8 gap-y-2 opacity-80"
-            style={{ '--i': 0 } as React.CSSProperties}
+            data-field-copy
+            className="mx-auto max-w-[96rem] px-(--gutter) pt-8 md:pt-12"
           >
-            <p>
-              {estate?.name ?? 'Palm Grove Estate'} ·{' '}
-              {estate?.state ?? 'Osun State'}
-            </p>
-            <p className="tabular">
-              {fromPrice ? `From ${utils.format.naira(fromPrice)} · ` : ''}Palm
-              oil income from year 3
+            <div
+              className="micro load-fade flex flex-wrap justify-between gap-x-8 gap-y-2 opacity-80"
+              style={{ '--i': 0 } as React.CSSProperties}
+            >
+              <p>
+                {estate?.name ?? 'Palm Grove Estate'} ·{' '}
+                {estate?.state ?? 'Osun State'}
+              </p>
+              <p className="tabular">
+                {fromPrice ? `From ${utils.format.naira(fromPrice)} · ` : ''}
+                Palm oil income from year 3
+              </p>
+            </div>
+            <h1 className="font-display mt-8 text-[clamp(2.6rem,6.3vw,7rem)] leading-[0.95] tracking-[-0.03em] md:mt-10">
+              <SplitWords
+                parts={[
+                  { text: 'Own titled farmland.', breakAfter: true },
+                  {
+                    text: 'We farm it.',
+                    className: 'em-oil',
+                    breakAfter: true,
+                  },
+                  { text: 'You earn from the harvest.' },
+                ]}
+              />
+            </h1>
+            <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
+              <p
+                className="text-lede measure load-fade opacity-85"
+                style={{ '--i': 2 } as React.CSSProperties}
+              >
+                Palm Grove Estate, Osun State: titled oil-palm plots
+                {fromPrice ? ` from ${utils.format.naira(fromPrice)}` : ''},
+                planted and fully managed by Jaylead. Palm oil income from year
+                3.
+              </p>
+              <div
+                className="load-fade"
+                style={{ '--i': 3 } as React.CSSProperties}
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <WhatsAppLink template="brochure" magnetic>
+                    Get the brochure on WhatsApp
+                  </WhatsAppLink>
+                  {estate?.brochureUrl ? (
+                    <a
+                      href={estate.brochureUrl}
+                      download
+                      className="pill pill-ghost"
+                    >
+                      Download PDF
+                      {estate.brochureSizeLabel
+                        ? ` (${estate.brochureSizeLabel})`
+                        : ''}
+                    </a>
+                  ) : null}
+                </div>
+                <ReplyNote className="mt-4" />
+              </div>
+            </div>
+            <p
+              className="micro load-fade mt-8 flex flex-wrap gap-x-6 gap-y-2 opacity-70"
+              style={{ '--i': 4 } as React.CSSProperties}
+            >
+              {trustLine.map((t) => (
+                <span key={t}>{t}</span>
+              ))}
+              <a href="#land-vs-shares" className="link-under text-oil">
+                How land compares to shares
+              </a>
             </p>
           </div>
-          <h1 className="font-display mt-8 text-[clamp(2.6rem,6.3vw,7rem)] leading-[0.95] tracking-[-0.03em] md:mt-10">
-            <SplitWords
-              parts={[
-                { text: 'Own titled farmland.', breakAfter: true },
-                { text: 'We farm it.', className: 'em-oil', breakAfter: true },
-                { text: 'You earn from the harvest.' },
-              ]}
-            />
-          </h1>
-          <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
-            <p
-              className="text-lede measure load-fade opacity-85"
-              style={{ '--i': 2 } as React.CSSProperties}
-            >
-              Palm Grove Estate, Osun State: titled oil-palm plots
-              {fromPrice ? ` from ${utils.format.naira(fromPrice)}` : ''},
-              planted and fully managed by Jaylead. Palm oil income from year 3.
-            </p>
-            <div
-              className="load-fade"
-              style={{ '--i': 3 } as React.CSSProperties}
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <WhatsAppLink template="brochure" magnetic>
-                  Get the brochure on WhatsApp
-                </WhatsAppLink>
-                {estate?.brochureUrl ? (
-                  <a
-                    href={estate.brochureUrl}
-                    download
-                    className="pill pill-ghost"
+
+          <div data-field-wrap className="stage-3d mt-14 md:mt-20">
+            <div data-field-plane className="relative mx-auto max-w-[110rem]">
+              <AerialPlayer
+                src={aerialSrc}
+                poster={images['aerial-fields'].src}
+                className="group relative block"
+              >
+                <Photo
+                  image={images['aerial-fields']}
+                  sizes="100vw"
+                  priority
+                  aspect={16 / 8}
+                  className="overflow-hidden"
+                />
+                <span
+                  data-field-veil
+                  aria-hidden
+                  className="bg-ink pointer-events-none absolute inset-0 opacity-15"
+                />
+                <span className="from-ink/70 absolute inset-x-0 bottom-0 flex flex-col items-start gap-4 bg-gradient-to-t to-transparent p-5 pt-16 sm:flex-row sm:items-end sm:justify-between md:p-10">
+                  <span
+                    data-field-caption
+                    className="micro text-bone max-w-[22ch] leading-relaxed"
                   >
-                    Download PDF
-                    {estate.brochureSizeLabel
-                      ? ` (${estate.brochureSizeLabel})`
-                      : ''}
-                  </a>
-                ) : null}
-              </div>
-              <ReplyNote className="mt-4" />
+                    Jaylead farmland from the air, September 2026
+                  </span>
+                  <WatchPill />
+                </span>
+              </AerialPlayer>
             </div>
           </div>
-          <p
-            className="micro load-fade mt-8 flex flex-wrap gap-x-6 gap-y-2 opacity-70"
-            style={{ '--i': 4 } as React.CSSProperties}
-          >
-            {trustLine.map((t) => (
-              <span key={t}>{t}</span>
-            ))}
-            <a href="#land-vs-shares" className="link-under text-oil">
-              How land compares to shares
-            </a>
-          </p>
-        </div>
-
-        <div data-field-wrap className="stage-3d mt-14 md:mt-20">
-          <div data-field-plane className="relative mx-auto max-w-[110rem]">
-            <AerialPlayer
-              src="/video/aerial.mp4"
-              poster={images['aerial-fields'].src}
-              className="group relative block"
-            >
-              <Photo
-                image={images['aerial-fields']}
-                sizes="100vw"
-                priority
-                aspect={16 / 8}
-                className="overflow-hidden"
-              />
-              <span
-                data-field-veil
-                aria-hidden
-                className="bg-ink pointer-events-none absolute inset-0 opacity-15"
-              />
-              <span className="from-ink/70 absolute inset-x-0 bottom-0 flex flex-col items-start gap-4 bg-gradient-to-t to-transparent p-5 pt-16 sm:flex-row sm:items-end sm:justify-between md:p-10">
-                <span
-                  data-field-caption
-                  className="micro text-bone max-w-[22ch] leading-relaxed"
-                >
-                  Jaylead farmland from the air, September 2026
-                </span>
-                <WatchPill />
-              </span>
-            </AerialPlayer>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <Marquee
         items={[
@@ -340,20 +396,9 @@ export default async function Home() {
           lede="Dated work from the land, as it happens. Every entry links to its Farm Update."
         />
         <ol className="mt-20 grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-          {soil ? (
+          {firstProof ? (
             <li data-motion="depth" data-motion-depth="0.2">
-              <VideoCard
-                video={soil}
-                sizes="(min-width: 1024px) 22vw, (min-width: 640px) 50vw, 100vw"
-                showSummary={false}
-                meta={`Soil testing · ${utils.format.date(soil.publishedOn ?? '')}`}
-              />
-              <Link
-                href="/blog/why-we-soil-test-before-planting"
-                className="font-display mt-2 block text-xl leading-snug"
-              >
-                Why every estate is soil-tested before planting
-              </Link>
+              <ProofCard {...firstProof} />
             </li>
           ) : null}
           <li data-motion="depth" data-motion-depth="0.6" className="lg:mt-24">
@@ -377,25 +422,14 @@ export default async function Home() {
               </p>
             </Link>
           </li>
-          {onSite ? (
+          {secondProof ? (
             <li data-motion="depth" data-motion-depth="0.3" className="lg:mt-8">
-              <VideoCard
-                video={onSite}
-                sizes="(min-width: 1024px) 22vw, (min-width: 640px) 50vw, 100vw"
-                showSummary={false}
-                meta={`On site · ${utils.format.date(onSite.publishedOn ?? '')}`}
-              />
-              <Link
-                href="/blog/what-land-backed-means"
-                className="font-display mt-2 block text-xl leading-snug"
-              >
-                What “land-backed” actually means
-              </Link>
+              <ProofCard {...secondProof} />
             </li>
           ) : null}
           <li data-motion="depth" data-motion-depth="0.8" className="lg:mt-36">
             <AerialPlayer
-              src="/video/aerial.mp4"
+              src={aerialSrc}
               poster={images['aerial-fields'].src}
               className="group relative block overflow-hidden"
             >

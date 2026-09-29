@@ -21,8 +21,8 @@ import { WhatsAppLink } from '@/components/whatsapp-cta';
 
 import {
   getCredentials,
-  getEstate,
   getFaqs,
+  getMainEstate,
   getSettings,
   getVideosFor,
 } from '@/lib/content';
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 export default async function WhyUs() {
   const [creds, estate, settings, faqs, videos] = await Promise.all([
     getCredentials(),
-    getEstate('palm-grove'),
+    getMainEstate(),
     getSettings(),
     getFaqs(),
     getVideosFor('how-it-works'),

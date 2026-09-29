@@ -5,6 +5,7 @@
  */
 import { Suspense } from 'react';
 
+import { DraftPreview } from '@/components/draft-preview';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { SmoothScroll } from '@/components/smooth-scroll';
@@ -26,6 +27,9 @@ export default function SiteLayout({
       {/* usePathname inside: Suspense keeps the chrome prerendered on any route with an unknown param */}
       <Suspense fallback={null}>
         <SmoothScroll />
+      </Suspense>
+      <Suspense fallback={null}>
+        <DraftPreview />
       </Suspense>
     </>
   );

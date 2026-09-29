@@ -45,14 +45,10 @@ export type SiteSettings = {
   mission: string;
   missionShort: string;
   tagline: string;
-  positioningLine: string;
   phoneDisplay: string;
   phoneE164: string;
   whatsappNumber: string;
   email: string;
-  salesEmail: string;
-  hrEmail: string;
-  mediaEmail: string;
   address: {
     line1: string;
     landmarkDirections: string;
@@ -78,7 +74,6 @@ export type SiteSettings = {
   announcementBar?: { enabled: boolean; text: string; link?: string };
   showFaithValues: boolean;
   faithValues: { title: string; description: string; reference: string }[];
-  creedText?: string;
   pricesUpdated: string;
   cacVerifyUrl: string;
   whatsappChannelUrl?: string;
@@ -92,13 +87,10 @@ export type SocialPlatform =
   | 'youtube'
   | 'x';
 
-export type EstateStatus = 'selling' | 'planting' | 'producing' | 'coming-soon';
-
 export type DocumentType = {
   _id: string;
   name: string;
   plainExplanation: string;
-  sampleImage?: Img;
 };
 
 export type Estate = {
@@ -108,7 +100,6 @@ export type Estate = {
   state: string;
   lga?: string;
   town?: string;
-  status: EstateStatus;
   summary: string;
   body?: RichText;
   headlineStats?: { totalAcres?: number; totalTrees?: number };
@@ -117,13 +108,14 @@ export type Estate = {
   incomeStartYear: number;
   productiveLifeText: string;
   documents: DocumentType[];
-  timeline: { label: string; description: string }[];
   gallery: Img[];
   heroImage?: Img;
   brochureUrl?: string;
   brochureSizeLabel?: string;
   mapUrl?: string;
-  mapImage?: Img;
+  /** Self-hosted aerial clip (MP4) played by the aerial player. */
+  aerialFileUrl?: string;
+  /** The same footage posted on Instagram/TikTok/YouTube, for search data. */
   aerialVideoId?: string;
   seo?: Seo;
   hidden?: boolean;
@@ -221,7 +213,6 @@ export type Post = {
   coverImage: Img;
   body: RichText;
   category: Category;
-  estateSlug?: string;
   author: Author;
   publishedAt: string;
   updatedAt?: string;
@@ -230,7 +221,6 @@ export type Post = {
   faq?: { question: string; answer: string }[];
   recordedOn?: string;
   recordedAt?: string;
-  relatedPlotSlug?: string;
 };
 
 export type FaqGroup =
@@ -261,13 +251,12 @@ export type TeamMember = {
 
 export type Department = { _id: string; name: string; order: number };
 
+/** Where a video appears. Each value is read by exactly one page section. */
 export type VideoPlacement =
-  | 'home-hero-aerial'
-  | 'founder-story'
-  | 'proof-strip'
-  | 'how-it-works'
-  | 'about-office'
-  | 'estate';
+  | 'founder-story' // Home: founder section; About: our story
+  | 'proof-strip' // Home: field record (first two)
+  | 'how-it-works' // Why us: how it works
+  | 'about-office'; // About: our office
 
 export type Video = {
   /** platform:id, stable across the file and Sanity. */
@@ -283,9 +272,9 @@ export type Video = {
   summary?: string;
   publishedOn?: string;
   account: 'brand' | 'founder';
-  featured: boolean;
   placements: VideoPlacement[];
-  estateSlug?: string;
+  /** _id of the post a field-record card links to. */
+  relatedPostId?: string;
   /** Where the entry came from; Sanity wins when both define one. */
   source: 'file' | 'sanity';
 };

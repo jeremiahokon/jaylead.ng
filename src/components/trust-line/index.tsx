@@ -5,7 +5,7 @@
  * register entry (TrustBlock) follows further down the page.
  */
 import { getSettings, getShownCredentials } from '@/lib/content';
-import { cn } from '@/lib/utils';
+import { cn, utils } from '@/lib/utils';
 
 export async function TrustLine({ className }: { className?: string }) {
   const [s, creds] = await Promise.all([getSettings(), getShownCredentials()]);
@@ -27,7 +27,7 @@ export async function TrustLine({ className }: { className?: string }) {
       <li>
         Office: {s.address.landmarkDirections}, {s.address.city}
       </li>
-      <li>Mon to Fri, 9am to 5pm</li>
+      <li>{utils.format.hours(s.officeHours, { short: true })}</li>
       <li>MD: Adetunji Jacob Ogunyemi</li>
       <li>
         <a

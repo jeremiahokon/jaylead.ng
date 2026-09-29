@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { LegalPage } from '@/components/legal-page';
 
 import { getSettings } from '@/lib/content';
+import { siteHost } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy: Jaylead AgriEstate',
@@ -25,8 +26,8 @@ export default async function Privacy() {
     >
       <p>
         This policy explains what {s.legalName} (“Jaylead”, “we”) collects
-        through www.jayleadagro.com, why, and what you can ask us to do with it.
-        It is written to meet the Nigeria Data Protection Act 2023.
+        through {siteHost}, why, and what you can ask us to do with it. It is
+        written to meet the Nigeria Data Protection Act 2023.
       </p>
       <h2>What we collect</h2>
       <p>

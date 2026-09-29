@@ -450,9 +450,18 @@ dialog.aerial-dialog::backdrop {
     both;
 }
 
+/* The mask reaches 0.3em below each word for descenders, so the word must
+   start further down than its own height or its cap tops show before it
+   rises. 160% clears that room plus the tilt; the fade covers any
+   rounding at small sizes. */
 @keyframes word-rise {
   from {
-    transform: translateY(115%) rotate(4deg);
+    opacity: 0;
+    transform: translateY(160%) rotate(4deg);
+  }
+
+  40% {
+    opacity: 1;
   }
 }
 

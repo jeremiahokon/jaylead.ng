@@ -8,7 +8,9 @@ import Link from 'next/link';
 
 import type { Metadata } from 'next';
 
-import { type LeadType, successCopy } from '@/lib/forms/fields';
+import { getSettings } from '@/lib/content';
+import { type LeadType, leadTypes, successMessage } from '@/lib/forms/fields';
+import { utils } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Thank you: Jaylead AgriEstate',
@@ -21,7 +23,12 @@ async function Message({
   searchParams: Promise<{ type?: string; wa?: string }>;
 }) {
   const { type, wa } = await searchParams;
-  const copy = successCopy[type as LeadType] ?? 'Thank you. We’ll be in touch.';
+  const hours = utils.format.hours((await getSettings()).officeHours);
+
+  const copy = leadTypes.includes(type as LeadType)
+    ? successMessage(type as LeadType, hours)
+    : 'Thank you. We’ll be in touch.';
+
   const href = wa?.startsWith('https://wa.me/') ? wa : undefined;
 
   return (

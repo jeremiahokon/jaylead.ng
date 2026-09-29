@@ -24,8 +24,8 @@ import { TrustLine } from '@/components/trust-line';
 import { CtaGroup, WhatsAppLink } from '@/components/whatsapp-cta';
 
 import {
-  getDocuments,
   getEstate,
+  getEstateDocuments,
   getFaqs,
   getPlot,
   getPlots,
@@ -62,14 +62,11 @@ const status = {
 export default async function PlotPage({ params }: Props) {
   const { slug } = await params;
 
-  const [plot, faqs, documents] = await Promise.all([
-    getPlot(slug),
-    getFaqs(),
-    getDocuments(),
-  ]);
+  const [plot, faqs] = await Promise.all([getPlot(slug), getFaqs()]);
 
   if (!plot) notFound();
   const estate = await getEstate(plot.estateSlug);
+  const documents = await getEstateDocuments(estate);
   const related = faqs.filter((f) => f.group === 'Owning a plot').slice(0, 6);
 
   const crumbs = [
@@ -83,15 +80,23 @@ export default async function PlotPage({ params }: Props) {
     trees: String(plot.trees),
   };
 
-  const location = ['Osun State', estate?.lga].filter(Boolean).join(', ');
+  const location = [estate?.state ?? 'Osun State', estate?.lga]
+    .filter(Boolean)
+    .join(', ');
 
   const rows: [string, string][] = [
     ['Asset type', 'Oil palm plot, titled land'],
     ['Size', `${plot.sizeLabel} (${plot.sizeInAcres} acres)`],
-    ['Oil palms', `${plot.trees} Supergene oil palms`],
+    [
+      'Oil palms',
+      `${plot.trees} ${estate?.palmVariety ?? 'Supergene'} oil palms`,
+    ],
     ['Location', `${plot.estateName}, ${location}`],
     ['Price', plotPrice(plot)],
-    ['Income start', 'Year 3, from crude palm oil'],
+    [
+      'Income start',
+      `Year ${estate?.incomeStartYear ?? 3}, from crude palm oil`,
+    ],
     ['Legal documents', documents.map((d) => d.name).join(', ')],
     ['Annual fees', 'None'],
     ['Status', status[plot.status]],

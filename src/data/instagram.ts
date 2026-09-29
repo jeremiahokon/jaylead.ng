@@ -42,12 +42,11 @@ type Card = Omit<
   | 'canonicalUrl'
   | 'embedUrl'
   | 'source'
-  | 'featured'
   | 'placements'
   | 'account'
   | 'aspect'
 > &
-  Partial<Pick<Video, 'featured' | 'account' | 'aspect'>> & {
+  Partial<Pick<Video, 'account' | 'aspect' | 'relatedPostId'>> & {
     placements?: VideoPlacement[];
   };
 
@@ -60,7 +59,6 @@ const cards: Record<string, Card> = {
       'Adetunji Jacob Ogunyemi explains how Jaylead began: growing up around farming, working as a software engineer, being laid off as AI changed his industry, and planning a personal palm farm that grew into a managed agri-estate where owners earn from their land’s palm oil.',
     publishedOn: '2026-06-05',
     placements: ['founder-story'],
-    featured: true,
   },
   DdZEAqaKey0: {
     title: 'Aerial view of Jaylead farmland',
@@ -69,9 +67,7 @@ const cards: Record<string, Card> = {
     summary:
       'A silent drone flight over open farmland, crop plots and a perimeter fence.',
     publishedOn: '2026-09-17',
-    placements: ['home-hero-aerial', 'estate', 'proof-strip'],
     aspect: '16:9',
-    featured: true,
   },
   'DdJx-XQqgvp': {
     title: 'Soil testing before planting',
@@ -80,6 +76,7 @@ const cards: Record<string, Card> = {
     summary: 'A short clip about testing the soil before cultivation starts.',
     publishedOn: '2026-09-11',
     placements: ['proof-strip'],
+    relatedPostId: 'post-2', // Why every Jaylead estate is soil-tested before planting
     aspect: '4:5',
   },
   DdUCrOCqirW: {
@@ -90,7 +87,6 @@ const cards: Record<string, Card> = {
       'Highlights from the official opening of the Jaylead office in Tanke, Ilorin, with prayers, guests and the team.',
     publishedOn: '2026-09-15',
     placements: ['about-office'],
-    featured: true,
   },
   'DdEvWuJq-mb': {
     title: 'Something happened at Jaylead',
@@ -138,6 +134,7 @@ const cards: Record<string, Card> = {
     summary: 'The Managing Director on farmland being prepared for planting.',
     publishedOn: '2026-09-09',
     placements: ['proof-strip'],
+    relatedPostId: 'post-10', // What "land-backed" actually means
     account: 'founder',
     aspect: '4:5',
   },
@@ -196,7 +193,7 @@ function build(): Video[] {
       summary: card?.summary,
       publishedOn: card?.publishedOn,
       account: card?.account ?? 'brand',
-      featured: card?.featured ?? false,
+      relatedPostId: card?.relatedPostId,
       placements: card?.placements ?? [],
       source: 'file',
     });

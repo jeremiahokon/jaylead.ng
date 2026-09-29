@@ -1,7 +1,24 @@
 import type { NextConfig } from 'next';
 
+const env = process.env;
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
+
+  // The Vercel Sanity integration can be installed with another prefix; copy
+  // whichever name it used into the public ones the browser Studio reads.
+  env: {
+    NEXT_PUBLIC_SANITY_PROJECT_ID:
+      env.NEXT_PUBLIC_SANITY_PROJECT_ID ||
+      env.SANITY_PROJECT_ID ||
+      env.SANITY_STUDIO_API_PROJECT_ID ||
+      '',
+    NEXT_PUBLIC_SANITY_DATASET:
+      env.NEXT_PUBLIC_SANITY_DATASET ||
+      env.SANITY_DATASET ||
+      env.SANITY_STUDIO_API_DATASET ||
+      'production',
+  },
 
   experimental: {
     turbopackFileSystemCacheForDev: true,
@@ -17,26 +34,6 @@ const nextConfig: NextConfig = {
     qualities: [70, 75],
     minimumCacheTTL: 31_536_000,
     remotePatterns: [{ protocol: 'https', hostname: 'cdn.sanity.io' }],
-  },
-
-  // Pages folded into the main ones (owner, 28 Sep 2026). Permanent, so old
-  // shared links and search results land on the page that now holds the content.
-  async redirects() {
-    return [
-      { source: '/faq', destination: '/#questions', permanent: true },
-      { source: '/faqs', destination: '/#questions', permanent: true },
-      { source: '/how-it-works', destination: '/why-us', permanent: true },
-      {
-        source: '/estates/:slug',
-        destination: '/marketplace',
-        permanent: true,
-      },
-      {
-        source: '/brochure',
-        destination: '/marketplace#brochure',
-        permanent: true,
-      },
-    ];
   },
 };
 

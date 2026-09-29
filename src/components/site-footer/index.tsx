@@ -141,7 +141,9 @@ export async function SiteFooter() {
                   {s.email}
                 </a>
               </p>
-              <p className="text-sand">Monday to Friday, 9am to 5pm (WAT)</p>
+              <p className="text-sand">
+                {utils.format.hours(s.officeHours)} (WAT)
+              </p>
               <p className="text-sand">
                 Led by Adetunji Jacob Ogunyemi, Managing Director.{' '}
                 <a

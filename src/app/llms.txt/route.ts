@@ -35,7 +35,7 @@ export async function GET() {
     `- Registrations: ${creds.map((c) => c.shortName).join(', ')}`,
     `- Managing Director: Adetunji Jacob Ogunyemi`,
     `- Office: ${s.address.line1}, ${s.address.landmarkDirections}, ${s.address.city}, ${s.address.state}`,
-    `- Hours: Monday to Friday, 9am to 5pm (WAT)`,
+    `- Hours: ${utils.format.hours(s.officeHours)} (WAT)`,
     `- Phone and WhatsApp: ${s.phoneDisplay}`,
     `- Email: ${s.email}`,
     `- Website: ${absolute('/')}`,

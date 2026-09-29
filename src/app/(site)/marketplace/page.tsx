@@ -29,9 +29,9 @@ import { TrustLine } from '@/components/trust-line';
 import { CtaGroup, WhatsAppLink } from '@/components/whatsapp-cta';
 
 import {
-  getDocuments,
-  getEstate,
+  getEstateDocuments,
   getFaqs,
+  getMainEstate,
   getPlots,
   getPosts,
   getSettings,
@@ -42,27 +42,52 @@ import { utils } from '@/lib/utils';
 
 import { images } from '@/data/images';
 
-const title = 'Palm Grove Estate Marketplace: Oil Palm Plots in Osun State';
+/**
+ * Title and description: the estate's SEO fields in the Studio when set,
+ * else built from the live plots so prices in Google follow the Studio.
+ */
+async function seo() {
+  const [estate, plots] = await Promise.all([getMainEstate(), getPlots()]);
+  const name = estate?.name ?? 'Palm Grove Estate';
+  const where = estate?.state ?? 'Osun State';
 
-const description =
-  '1 acre (60 trees) from ₦4,000,000 or 1 hectare (150 trees) for ₦10,000,000 at Palm Grove Estate, Osun State: titled, planted and fully managed by Jaylead.';
+  const offer = plots
+    .filter((p) => p.status !== 'sold')
+    .map((p) => `${p.sizeLabel} (${p.trees} trees) ${plotPrice(p)}`)
+    .join(' or ');
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: '/marketplace' },
-  openGraph: { title, description, url: '/marketplace' },
-};
+  return {
+    title:
+      estate?.seo?.title || `${name} Marketplace: Oil Palm Plots in ${where}`,
+    description:
+      estate?.seo?.description ||
+      `${offer ? `${offer} at ` : ''}${name}, ${where}: titled, planted and fully managed by Jaylead.`,
+  };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { title, description } = await seo();
+
+  return {
+    title,
+    description,
+    alternates: { canonical: '/marketplace' },
+    openGraph: { title, description, url: '/marketplace' },
+  };
+}
 
 export default async function Marketplace() {
-  const [plots, settings, documents, estate, faqs, posts] = await Promise.all([
-    getPlots(),
-    getSettings(),
-    getDocuments(),
-    getEstate('palm-grove'),
-    getFaqs(),
-    getPosts(),
-  ]);
+  const [plots, settings, estate, faqs, posts, { title, description }] =
+    await Promise.all([
+      getPlots(),
+      getSettings(),
+      getMainEstate(),
+      getFaqs(),
+      getPosts(),
+      seo(),
+    ]);
+
+  const documents = await getEstateDocuments(estate);
 
   const aerial = await getVideo(estate?.aerialVideoId);
 
@@ -131,7 +156,7 @@ export default async function Marketplace() {
       {/* The land. */}
       <section className="px-(--gutter) pb-24">
         <AerialPlayer
-          src="/video/aerial.mp4"
+          src={estate?.aerialFileUrl ?? '/video/aerial.mp4'}
           poster={hero.src}
           className="group relative mx-auto block max-w-[110rem] overflow-hidden"
         >
