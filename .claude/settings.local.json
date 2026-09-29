@@ -3,9 +3,14 @@
     "allow": [
       "WebFetch(domain:github.com)",
       "Bash(gh api *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "mcp__Sanity__run_sanity_cli",
+      "Bash(cd *)",
+      "Bash(git check-ignore *)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["next-devtools"]
+  "enabledMcpjsonServers": [
+    "next-devtools"
+  ]
 }
