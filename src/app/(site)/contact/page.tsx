@@ -126,7 +126,9 @@ export default async function Contact() {
                 {s.address.line1}, {s.address.landmarkDirections},{' '}
                 {s.address.city}, {s.address.state}.
               </p>
-              <p className="opacity-80">Monday to Friday, 9am to 5pm (WAT).</p>
+              <p className="opacity-80">
+                {utils.format.hours(s.officeHours)} (WAT).
+              </p>
             </address>
             <div className="mt-10 flex flex-wrap gap-3">
               <a

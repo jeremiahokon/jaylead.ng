@@ -7,7 +7,7 @@
 import { Photo } from '@/components/photo';
 
 import { getSettings } from '@/lib/content';
-import { cn } from '@/lib/utils';
+import { cn, utils } from '@/lib/utils';
 
 import { images } from '@/data/images';
 
@@ -37,7 +37,7 @@ export async function TrustBlock({
         </a>
       </>,
     ],
-    ['Hours', 'Monday to Friday, 9am to 5pm (WAT)'],
+    ['Hours', `${utils.format.hours(s.officeHours)} (WAT)`],
     [
       'Registered',
       <>

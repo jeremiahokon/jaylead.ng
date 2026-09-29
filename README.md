@@ -1,21 +1,20 @@
-# Jaylead AgriEstate: www.jayleadagro.com
+# Jaylead AgriEstate: jayleadng-weld.vercel.app
 
 Marketing site for Jaylead AgriEstate Limited: titled oil-palm farmland at Palm Grove Estate, Osun State. Next.js 16 (App Router, Cache Components), Tailwind v4, Sanity CMS with the Studio at `/studio`, and GSAP for motion.
 
 ## Commands
 
-| Command           | What it does                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------ |
-| `pnpm dev`        | Local dev server                                                                     |
-| `pnpm build`      | Production build (every public page is static)                                       |
-| `pnpm test`       | Unit tests: naira formatter, embed parser, WhatsApp links, Option A maths            |
-| `pnpm check`      | Prettier and ESLint                                                                  |
-| `pnpm check:copy` | Banned phrases and em dashes in the rendered pages and seed copy (run after `build`) |
-| `pnpm verify`     | test, build and copy check in one go                                                 |
-| `pnpm assets`     | Rebuilds web images, video posters and the aerial clip from `jaylead_ng/`            |
-| `pnpm fonts`      | Rebuilds the three woff2 files (needs `pip install fonttools brotli`)                |
-| `pnpm og`         | Re-renders the share cards from `scripts/opengraph-image.html`                       |
-| `pnpm seed`       | Loads the starter content into Sanity (needs `.env.local`)                           |
+| Command             | What it does                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| `pnpm dev`          | Local dev server                                                                     |
+| `pnpm build`        | Production build (every public page is static)                                       |
+| `pnpm test`         | Unit tests: naira formatter, embed parser, WhatsApp links, Option A maths            |
+| `pnpm check`        | Prettier and ESLint                                                                  |
+| `pnpm check:copy`   | Banned phrases and em dashes in the rendered pages and seed copy (run after `build`) |
+| `pnpm verify`       | test, build and copy check in one go                                                 |
+| `pnpm og`           | Re-renders the share cards from `scripts/opengraph-image.html`                       |
+| `pnpm seed`         | Loads the starter content into Sanity (needs `.env.local`)                           |
+| `pnpm webhook:test` | Sends `/api/revalidate` a signed test request (`pnpm webhook:test plot https://…`)   |
 
 ## Where things live
 

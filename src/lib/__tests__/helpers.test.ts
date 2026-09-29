@@ -11,6 +11,29 @@ describe('utils.format.naira', () => {
   });
 });
 
+describe('utils.format.hours', () => {
+  const weekdays = [
+    { days: 'Monday to Friday', opens: '09:00', closes: '17:00' },
+  ];
+
+  it('reads the office hours from Site settings', () => {
+    expect(utils.format.hours(weekdays)).toBe('Monday to Friday, 9am to 5pm');
+    expect(utils.format.hours(weekdays, { short: true })).toBe(
+      'Mon to Fri, 9am to 5pm'
+    );
+  });
+
+  it('keeps minutes, joins several rows and skips incomplete ones', () => {
+    expect(
+      utils.format.hours([
+        ...weekdays,
+        { days: 'Saturday', opens: '10:30', closes: '12:00' },
+        { days: 'Sunday', opens: '', closes: '' },
+      ])
+    ).toBe('Monday to Friday, 9am to 5pm; Saturday, 10:30am to 12pm');
+  });
+});
+
 describe('utils.invest.optionASchedule', () => {
   const terms = {
     yearlyRatePercent: 40,

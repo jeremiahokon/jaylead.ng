@@ -1,12 +1,29 @@
 /**
- * The one canonical origin, shared by metadata, JSON-LD, the sitemap, robots
- * and llms.txt so none of them can name a different host. The brief fixes
- * www.jayleadagro.com as canonical (apex redirects to www at the host), so a
- * Vercel preview URL is never used as the canonical, only NEXT_PUBLIC_SITE_URL.
+ * The one canonical origin, shared by metadata, JSON-LD, the sitemap, robots,
+ * llms.txt and the legal pages so none of them can name a different host.
+ * The owner chose jayleadng-weld.vercel.app (29 Sep 2026). When
+ * www.jayleadagro.com goes live, change CANONICAL (or set
+ * NEXT_PUBLIC_SITE_URL in Vercel) and every URL follows. Branch preview URLs
+ * are never used as the canonical.
  */
-export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.jayleadagro.com'
-).replace(/\/$/, '');
+const CANONICAL = 'https://jayleadng-weld.vercel.app';
+
+/**
+ * Tolerates the ways the variable arrives from a host dashboard: unset,
+ * empty, or typed without the protocol ("jayleadng-weld.vercel.app"). Anything that
+ * still isn't a URL falls back to the canonical origin instead of failing
+ * the build.
+ */
+function resolveSiteUrl(raw: string | undefined): string {
+  const value = raw?.trim();
+
+  if (!value) return CANONICAL;
+  const withProtocol = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+
+  return URL.canParse(withProtocol) ? new URL(withProtocol).origin : CANONICAL;
+}
+
+export const siteUrl = resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 /** Absolute URL for a site path. */
 export const absolute = (path = '/') =>
@@ -23,3 +40,6 @@ export const siteKeywords = [
   'agro estate Osun',
   'real estate Ilorin',
 ];
+
+/** The bare host for running text: "jayleadng-weld.vercel.app". */
+export const siteHost = new URL(siteUrl).host;

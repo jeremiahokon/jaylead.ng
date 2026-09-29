@@ -54,15 +54,26 @@ export const siteSettings = defineType({
       type: 'string',
       group: 'company',
     }),
-    defineField({ name: 'mission', type: 'text', rows: 3, group: 'company' }),
+    defineField({
+      name: 'mission',
+      type: 'text',
+      rows: 3,
+      group: 'company',
+      description: 'About page, "Our mission".',
+    }),
     defineField({
       name: 'missionShort',
       title: 'Mission (short, for the footer)',
       type: 'string',
       group: 'company',
+      description: 'Footer, on every page.',
     }),
-    defineField({ name: 'tagline', type: 'string', group: 'company' }),
-    defineField({ name: 'positioningLine', type: 'string', group: 'company' }),
+    defineField({
+      name: 'tagline',
+      type: 'string',
+      group: 'company',
+      description: 'Not shown on the page: used by Google and AI assistants.',
+    }),
     defineField({
       name: 'pricesUpdated',
       title: 'Prices updated',
@@ -77,7 +88,12 @@ export const siteSettings = defineType({
       type: 'url',
       group: 'company',
     }),
-    defineField({ name: 'phoneDisplay', type: 'string', group: 'contact' }),
+    defineField({
+      name: 'phoneDisplay',
+      type: 'string',
+      group: 'contact',
+      description: 'Header, footer, Contact and the legal pages.',
+    }),
     defineField({
       name: 'phoneE164',
       title: 'Phone (+234 format)',
@@ -89,12 +105,15 @@ export const siteSettings = defineType({
       title: 'WhatsApp number (digits only)',
       type: 'string',
       group: 'contact',
+      description: 'Every WhatsApp button on the site, e.g. 2348012345678.',
       validation: (r) => r.regex(/^\d{10,15}$/),
     }),
-    defineField({ name: 'email', type: 'string', group: 'contact' }),
-    defineField({ name: 'salesEmail', type: 'string', group: 'contact' }),
-    defineField({ name: 'hrEmail', type: 'string', group: 'contact' }),
-    defineField({ name: 'mediaEmail', type: 'string', group: 'contact' }),
+    defineField({
+      name: 'email',
+      type: 'string',
+      group: 'contact',
+      description: 'Footer, Contact and the legal pages.',
+    }),
     defineField({
       name: 'address',
       type: 'object',
@@ -121,22 +140,38 @@ export const siteSettings = defineType({
       name: 'officeHours',
       type: 'array',
       group: 'contact',
+      description:
+        'Footer, "Who you are dealing with", Contact, About and form replies. Written as "Monday to Friday, 9am to 5pm".',
       of: [
         defineArrayMember({
           type: 'object',
           fields: [
-            defineField({ name: 'days', type: 'string' }),
+            defineField({
+              name: 'days',
+              type: 'string',
+              description: 'For example "Monday to Friday" or "Saturday".',
+              validation: (r) => r.required(),
+            }),
             defineField({
               name: 'opens',
               type: 'string',
               description: '24-hour, e.g. 09:00',
+              validation: (r) => r.required().regex(/^\d{2}:\d{2}$/),
             }),
             defineField({
               name: 'closes',
               type: 'string',
               description: '24-hour, e.g. 17:00',
+              validation: (r) => r.required().regex(/^\d{2}:\d{2}$/),
             }),
           ],
+          preview: {
+            select: { days: 'days', opens: 'opens', closes: 'closes' },
+            prepare: ({ days, opens, closes }) => ({
+              title: days,
+              subtitle: `${opens ?? '?'} to ${closes ?? '?'}`,
+            }),
+          },
         }),
       ],
     }),
@@ -144,6 +179,7 @@ export const siteSettings = defineType({
       name: 'whatsappReplyNote',
       type: 'string',
       group: 'whatsapp',
+      description: 'The small line under WhatsApp buttons and in the menu.',
     }),
     defineField({
       name: 'whatsappTemplates',
@@ -232,6 +268,7 @@ export const siteSettings = defineType({
     defineField({
       name: 'showFaithValues',
       title: 'Show faith values on About',
+      description: 'About page, "04 Values". Off hides the faith values.',
       type: 'boolean',
       group: 'extras',
       initialValue: false,
@@ -251,7 +288,6 @@ export const siteSettings = defineType({
         }),
       ],
     }),
-    defineField({ name: 'creedText', type: 'text', group: 'extras' }),
   ],
   preview: { prepare: () => ({ title: 'Site settings' }) },
 });
@@ -272,7 +308,6 @@ export const documentType = defineType({
       rows: 3,
       validation: (r) => r.required(),
     }),
-    imageField('sampleImage', 'Redacted sample'),
     defineField({ name: 'order', type: 'number' }),
   ],
 });
@@ -298,13 +333,15 @@ export const estate = defineType({
     defineField({ name: 'lga', title: 'LGA', type: 'string' }),
     defineField({ name: 'town', type: 'string' }),
     defineField({
-      name: 'status',
-      type: 'string',
-      options: { list: ['selling', 'planting', 'producing', 'coming-soon'] },
-      initialValue: 'selling',
+      name: 'summary',
+      type: 'text',
+      rows: 3,
+      description: 'Marketplace, the line under the page title.',
     }),
-    defineField({ name: 'summary', type: 'text', rows: 3 }),
-    richText(),
+    {
+      ...richText(),
+      description: 'Marketplace, "02 What you own".',
+    },
     defineField({
       name: 'headlineStats',
       type: 'object',
@@ -332,7 +369,10 @@ export const estate = defineType({
     }),
     defineField({
       name: 'documents',
+      title: 'Title documents',
       type: 'array',
+      description:
+        'Marketplace "03 Your documents" and each plot page, in this order. Empty shows every title document.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -340,20 +380,10 @@ export const estate = defineType({
         }),
       ],
     }),
-    defineField({
-      name: 'timeline',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          fields: [
-            defineField({ name: 'label', type: 'string' }),
-            defineField({ name: 'description', type: 'text', rows: 2 }),
-          ],
-        }),
-      ],
-    }),
-    imageField('heroImage', 'Hero image', { realFlag: true }),
+    {
+      ...imageField('heroImage', 'Hero image', { realFlag: true }),
+      description: 'Marketplace aerial poster, above the plots.',
+    },
     defineField({
       name: 'gallery',
       type: 'array',
@@ -367,15 +397,33 @@ export const estate = defineType({
       name: 'brochure',
       type: 'file',
       options: { accept: 'application/pdf' },
+      description: 'Home hero and Marketplace "06 Brochure" download.',
     }),
-    defineField({ name: 'mapUrl', type: 'url' }),
-    imageField('mapImage', 'Map image'),
+    defineField({
+      name: 'mapUrl',
+      type: 'url',
+      description: 'Marketplace "05 Location".',
+    }),
+    defineField({
+      name: 'aerialFile',
+      title: 'Aerial clip (MP4)',
+      type: 'file',
+      options: { accept: 'video/mp4' },
+      description:
+        'Plays from "Watch the aerial" on Home and Marketplace. Keep it short, silent and under 5 MB. Empty uses the built-in clip.',
+    }),
     defineField({
       name: 'aerialVideo',
+      title: 'Aerial video post',
       type: 'reference',
       to: [{ type: 'videoEmbed' }],
+      description:
+        'The same footage on Instagram, TikTok or YouTube. Not shown on the page: used by Google.',
     }),
-    seoField,
+    {
+      ...seoField,
+      description: 'The Marketplace page in Google results.',
+    },
   ],
 });
 
@@ -415,6 +463,8 @@ export const plot = defineType({
       name: 'price',
       title: 'Price (naira, numbers only)',
       type: 'number',
+      description:
+        'Marketplace, the plot page, the calculator, Home ("From ₦…") and Google. Also update Site settings → Prices updated.',
       validation: (r) => r.integer().min(0),
     }),
     defineField({
@@ -428,6 +478,8 @@ export const plot = defineType({
       type: 'string',
       options: { list: ['available', 'reserved', 'sold'] },
       initialValue: 'available',
+      description:
+        'Sold plots leave Home and the calculator but stay listed on Marketplace.',
     }),
     defineField({
       name: 'paymentOptions',
@@ -473,7 +525,12 @@ export const investOption = defineType({
       options: { list: ['option-a', 'option-b'] },
       validation: (r) => r.required(),
     }),
-    defineField({ name: 'name', type: 'string' }),
+    defineField({
+      name: 'name',
+      type: 'string',
+      description: 'For example "Option A: Ownership Returns".',
+      validation: (r) => r.required(),
+    }),
     defineField({ name: 'tagline', type: 'string' }),
     defineField({ name: 'whoItsFor', type: 'string' }),
     defineField({ name: 'minAmount', type: 'number' }),

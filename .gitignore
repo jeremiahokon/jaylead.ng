@@ -30,7 +30,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files: every one, including .env.example (secrets come from Vercel
+# and `vercel env pull`)
 .env*
 
 # vercel
@@ -40,8 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-
-!.env.example
 
 # Source material and build notes: not used by `next build` or the live site.
 # The media the site ships is already processed into public/ and src/app/.
@@ -53,3 +52,13 @@ next-env.d.ts
 # local tooling output
 /.staging
 /.playwright-mcp
+
+# One-off build tools. They already ran and their output is committed
+# (public/images, src/data/images.ts, src/fonts/*.woff2, public/brand); most
+# need the local /jaylead_ng/ source or Python/potrace. Kept on disk only.
+/scripts/add-naira.py
+/scripts/build-fonts.sh
+/scripts/process-assets.mts
+/scripts/trace-logo.sh
+/scripts/brand/
+/scripts/migrate-content-model.mts

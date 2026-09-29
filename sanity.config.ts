@@ -9,8 +9,10 @@ import { presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
 
 import { apiVersion, dataset, projectId } from '@/sanity/env';
+import { resolve } from '@/sanity/presentation';
 import { schemaTypes, singletons } from '@/sanity/schemas';
 import { structure } from '@/sanity/structure';
+import { templates } from '@/sanity/templates';
 
 const singletonSet = new Set<string>(singletons);
 
@@ -22,10 +24,18 @@ export default defineConfig({
   dataset,
   schema: {
     types: schemaTypes,
-    templates: (templates) =>
-      templates.filter((t) => !singletonSet.has(t.schemaType)),
+    templates: (defaults) => [
+      ...defaults.filter((t) => !singletonSet.has(t.schemaType)),
+      ...templates,
+    ],
   },
   document: {
+    // The page-list templates need a group or placement, so they only
+    // appear inside those lists, not in the global "Create" menu.
+    newDocumentOptions: (prev, { creationContext }) =>
+      creationContext.type === 'global'
+        ? prev.filter((t) => !templates.some((x) => x.id === t.templateId))
+        : prev,
     actions: (actions, ctx) =>
       singletonSet.has(ctx.schemaType)
         ? actions.filter(
@@ -38,7 +48,13 @@ export default defineConfig({
   plugins: [
     structureTool({ structure }),
     presentationTool({
-      previewUrl: { previewMode: { enable: '/api/draft-mode/enable' } },
+      resolve,
+      previewUrl: {
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable',
+        },
+      },
     }),
     visionTool({ defaultApiVersion: apiVersion }),
   ],

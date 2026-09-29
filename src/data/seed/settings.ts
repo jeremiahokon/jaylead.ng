@@ -14,14 +14,10 @@ export const settingsSeed: SiteSettings = {
   missionShort:
     'Real, land-backed agriculture that grows Nigeria’s food supply and keeps producing for decades.',
   tagline: 'Real Assets. Real Harvests. Real Legacy.',
-  positioningLine: 'Land. Agriculture. Investment. Built to outlive us.',
   phoneDisplay: '+234 916 099 2539',
   phoneE164: '+2349160992539',
   whatsappNumber: '2349160992539',
   email: 'jayleadagriestate@gmail.com',
-  salesEmail: 'jayleadagriestate@gmail.com',
-  hrEmail: 'jayleadagriestate@gmail.com',
-  mediaEmail: 'jayleadagriestate@gmail.com',
   address: {
     line1: 'Tipper Garage Roundabout',
     landmarkDirections: 'beside Mazabs Event Centre, Tanke',
@@ -111,7 +107,8 @@ export const settingsSeed: SiteSettings = {
     {
       key: 'faq',
       label: 'FAQ',
-      message: "Hello Jaylead, I have a question that isn't on your FAQ page.",
+      message:
+        "Hello Jaylead, I have a question that isn't answered on your website.",
     },
   ],
   paymentSafety: {

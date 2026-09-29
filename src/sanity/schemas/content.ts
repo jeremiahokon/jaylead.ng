@@ -72,11 +72,6 @@ export const post = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
-      name: 'estate',
-      type: 'reference',
-      to: [{ type: 'estate' }],
-    }),
-    defineField({
       name: 'publishedAt',
       type: 'datetime',
       validation: (r) => r.required(),
@@ -107,11 +102,6 @@ export const post = defineType({
         }),
       ],
     }),
-    defineField({
-      name: 'relatedPlot',
-      type: 'reference',
-      to: [{ type: 'plot' }],
-    }),
     seoField,
   ],
   orderings: [
@@ -140,6 +130,8 @@ export const faqItem = defineType({
     defineField({
       name: 'group',
       type: 'string',
+      description:
+        'Decides the page: Company and trust → Why us and Contact · Owning a plot → Marketplace and plot pages · Investing → Invest · Realtors → Become a realtor · NYSC → NYSC · Visiting and contact → Contact.',
       options: {
         list: [
           'Company and trust',
@@ -153,7 +145,13 @@ export const faqItem = defineType({
       validation: (r) => r.required(),
     }),
     defineField({ name: 'order', type: 'number' }),
-    defineField({ name: 'showOnHome', type: 'boolean', initialValue: false }),
+    defineField({
+      name: 'showOnHome',
+      title: 'Also show on Home',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Home, "07 Questions". Keep it to about six.',
+    }),
   ],
   orderings: [
     {
@@ -248,30 +246,33 @@ export const videoEmbed = defineType({
       initialValue: 'brand',
     }),
     defineField({
-      name: 'featured',
-      title: 'Show on the Home page',
-      type: 'boolean',
-      initialValue: false,
-    }),
-    defineField({
       name: 'placements',
+      title: 'Show on',
       type: 'array',
+      description:
+        'Where the video appears. With none, it is only used inside blog posts.',
       of: [defineArrayMember({ type: 'string' })],
       options: {
         list: [
-          'home-hero-aerial',
-          'founder-story',
-          'proof-strip',
-          'how-it-works',
-          'about-office',
-          'estate',
+          { title: 'Home + About: founder story', value: 'founder-story' },
+          { title: 'Home: field record (newest two)', value: 'proof-strip' },
+          { title: 'Why us: how it works', value: 'how-it-works' },
+          { title: 'About: our office', value: 'about-office' },
         ],
       },
     }),
     defineField({
-      name: 'estate',
+      name: 'relatedPost',
+      title: 'Related post',
       type: 'reference',
-      to: [{ type: 'estate' }],
+      to: [{ type: 'post' }],
+      weak: true,
+      description:
+        'Home field record: the card links to this post and uses its title.',
+      hidden: ({ document }) =>
+        !(document?.placements as string[] | undefined)?.includes(
+          'proof-strip'
+        ),
     }),
   ],
   preview: { select: { title: 'title', subtitle: 'url', media: 'poster' } },

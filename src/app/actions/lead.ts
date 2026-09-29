@@ -19,7 +19,7 @@ import {
   type LeadType,
   leadTypes,
   schemas,
-  successCopy,
+  successMessage,
   templateFor,
 } from '@/lib/forms/schema';
 import { utils } from '@/lib/utils';
@@ -37,6 +37,10 @@ function limited(ip: string) {
 
   return recent.length > 5;
 }
+
+/** Office hours for the success message, from Site settings. */
+const hoursText = async () =>
+  utils.format.hours((await getSettings()).officeHours);
 
 async function notify(type: LeadType, data: Record<string, string>) {
   const key = process.env.RESEND_API_KEY;
@@ -81,7 +85,8 @@ export async function submitLead(
   );
 
   // Honeypot: real people never see or fill this field.
-  if (raw.company) return { status: 'ok', message: successCopy[type] };
+  if (raw.company)
+    return { status: 'ok', message: successMessage(type, await hoursText()) };
 
   const ip =
     (await headers()).get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
@@ -164,5 +169,9 @@ export async function submitLead(
       `/thank-you?type=${encodeURIComponent(type)}&wa=${encodeURIComponent(wa)}`
     );
 
-  return { status: 'ok', message: successCopy[type], whatsappHref: wa };
+  return {
+    status: 'ok',
+    message: successMessage(type, await hoursText()),
+    whatsappHref: wa,
+  };
 }

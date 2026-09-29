@@ -32,19 +32,23 @@ import { authorSeed, categoriesSeed, postsSeed } from '../src/data/seed/posts';
 import { settingsSeed } from '../src/data/seed/settings';
 import type { Img } from '../src/lib/types';
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const projectId =
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
 const token = process.env.SANITY_API_WRITE_TOKEN;
 if (!projectId || !token) {
   console.error(
-    'Missing NEXT_PUBLIC_SANITY_PROJECT_ID or SANITY_API_WRITE_TOKEN. See docs/sanity/env-setup.md.'
+    'Missing the Sanity project id or SANITY_API_WRITE_TOKEN. Run `vercel env pull .env.local` (see docs/sanity/env-setup.md).'
   );
   process.exit(1);
 }
 
 const client = createClient({
   projectId,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
-  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION ?? '2026-09-28',
+  dataset:
+    process.env.NEXT_PUBLIC_SANITY_DATASET ||
+    process.env.SANITY_DATASET ||
+    'production',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2026-09-28',
   token,
   useCdn: false,
 });
@@ -134,8 +138,10 @@ async function main() {
       summary: v.summary,
       publishedOn: v.publishedOn,
       account: v.account,
-      featured: v.featured,
       placements: v.placements,
+      relatedPost: v.relatedPostId
+        ? { _type: 'reference', _ref: v.relatedPostId, _weak: true }
+        : undefined,
     });
   }
 
@@ -148,7 +154,6 @@ async function main() {
       name: e.name,
       slug: slug(e.slug),
       state: e.state,
-      status: e.status,
       summary: e.summary,
       body: e.body,
       headlineStats: e.headlineStats,
@@ -157,7 +162,6 @@ async function main() {
       incomeStartYear: e.incomeStartYear,
       productiveLifeText: e.productiveLifeText,
       documents: e.documents.map((d, i) => ({ ...ref(d._id), _key: `d${i}` })),
-      timeline: keyed(e.timeline, 't'),
       heroImage: await image(e.heroImage),
       gallery: await images(e.gallery),
       aerialVideo: aerial

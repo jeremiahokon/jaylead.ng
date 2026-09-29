@@ -6,7 +6,8 @@
  * tagged by type in src/sanity/fetch.ts; the webhook expires them.
  *
  * A Sanity error never takes a page down: the accessor logs it and falls
- * back to the seed for that one read.
+ * back to the seed for that one read. The same goes for a type with nothing
+ * published yet, so connecting an empty dataset changes nothing on the site.
  */
 import type {
   Category,
@@ -59,7 +60,12 @@ async function read<T>(
   try {
     const data = await sanityFetch<T | null>(query, params, tags);
 
-    return data ?? seed;
+    // Nothing published yet (a fresh dataset, or blog posts still in draft):
+    // keep the seed so no section renders empty and every dynamic route
+    // still has params to prerender. The first published document wins.
+    if (data == null || (Array.isArray(data) && data.length === 0)) return seed;
+
+    return data;
   } catch (error) {
     console.error(
       `[content] Sanity read failed for ${tags.join(',')}, using seed.`,
@@ -121,6 +127,24 @@ export async function getEstates(): Promise<Estate[]> {
 
 export async function getEstate(slug: string): Promise<Estate | undefined> {
   return (await getEstates()).find((e) => e.slug === slug);
+}
+
+/**
+ * The estate Home, Marketplace and Why us are about. Palm Grove by slug,
+ * else the first visible estate, so a slug edit in the Studio can't blank
+ * three pages.
+ */
+export async function getMainEstate(): Promise<Estate | undefined> {
+  const estates = await getEstates();
+
+  return estates.find((e) => e.slug === 'palm-grove') ?? estates[0];
+}
+
+/** The estate's chosen title documents, or every document when none is set. */
+export async function getEstateDocuments(
+  estate: Estate | undefined
+): Promise<DocumentType[]> {
+  return estate?.documents.length ? estate.documents : getDocuments();
 }
 
 export async function getPlots(): Promise<Plot[]> {
@@ -190,7 +214,7 @@ export const getCategories = (): Promise<Category[]> =>
 export async function getPosts(): Promise<Post[]> {
   const posts = await read<Post[]>(
     q.postsQuery,
-    ['post', 'category', 'author'],
+    ['post', 'category', 'author', 'videoEmbed'],
     postsSeed
   );
 
@@ -234,6 +258,7 @@ export async function getVideos(): Promise<Video[]> {
       canonicalUrl: parsed.canonicalUrl,
       embedUrl: parsed.embedUrl,
       poster: row.poster?.src ? row.poster : fromFile?.poster,
+      relatedPostId: row.relatedPostId ?? fromFile?.relatedPostId,
       aspect: row.aspect ?? fromFile?.aspect ?? '9:16',
       account: row.account ?? 'brand',
       source: 'sanity',

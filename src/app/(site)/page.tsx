@@ -32,8 +32,8 @@ import { YearsScene } from '@/components/years-scene';
 
 import {
   getDepartments,
-  getEstate,
   getFaqs,
+  getMainEstate,
   getPlots,
   getPosts,
   getSettings,
@@ -42,21 +42,60 @@ import {
   getVideosFor,
 } from '@/lib/content';
 import { faqNode, videoNode } from '@/lib/jsonld';
+import type { Post, Video } from '@/lib/types';
 import { utils } from '@/lib/utils';
 
 import { images } from '@/data/images';
 
 const title = 'Jaylead AgriEstate: Titled Oil Palm Farmland in Osun, Nigeria';
 
-const description =
-  'Own titled oil-palm farmland from ₦4,000,000. We plant and manage it; you earn from the harvest from year 3. CAC registered, RC 9492571.';
+/** Built from the live plots and settings, so a price change in the Studio reaches Google too. */
+async function describe() {
+  const [plots, settings] = await Promise.all([getPlots(), getSettings()]);
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: '/' },
-  openGraph: { title, description, url: '/' },
-};
+  const prices = plots
+    .filter((p) => p.priceMode !== 'on-request')
+    .map((p) => p.price);
+
+  const from = prices.length
+    ? ` from ${utils.format.naira(Math.min(...prices))}`
+    : '';
+
+  return `Own titled oil-palm farmland${from}. We plant and manage it; you earn from the harvest from year 3. CAC registered, RC ${settings.rcNumber}.`;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const description = await describe();
+
+  return {
+    title,
+    description,
+    alternates: { canonical: '/' },
+    openGraph: { title, description, url: '/' },
+  };
+}
+
+/** A field-record video, titled and linked by its related post when set. */
+function ProofCard({ video, post }: { video: Video; post?: Post }) {
+  return (
+    <>
+      <VideoCard
+        video={video}
+        sizes="(min-width: 1024px) 22vw, (min-width: 640px) 50vw, 100vw"
+        showSummary={false}
+        meta={utils.format.date(video.publishedOn ?? '')}
+      />
+      {post ? (
+        <Link
+          href={`/blog/${post.slug}`}
+          className="font-display mt-2 block text-xl leading-snug"
+        >
+          {post.title}
+        </Link>
+      ) : null}
+    </>
+  );
+}
 
 export default async function Home() {
   const [
@@ -72,7 +111,7 @@ export default async function Home() {
     departments,
   ] = await Promise.all([
     getSettings(),
-    getEstate('palm-grove'),
+    getMainEstate(),
     getPlots(),
     getPosts(),
     getFaqs(),
@@ -90,10 +129,20 @@ export default async function Home() {
     ? Math.min(...priced.map((p) => p.price))
     : undefined;
 
-  const homeFaqs = faqs.filter((f) => f.showOnHome);
+  const description = await describe();
+  const aerialSrc = estate?.aerialFileUrl ?? '/video/aerial.mp4';
+
+  // Never an empty Questions section: fall back to the first six.
+  const picked = faqs.filter((f) => f.showOnHome);
+  const homeFaqs = picked.length ? picked : faqs.slice(0, 6);
   const founderVideo = founder[0];
-  const soil = proof.find((v) => v.key === 'instagram:DdJx-XQqgvp');
-  const onSite = proof.find((v) => v.key === 'instagram:DdD4lwIummX');
+
+  // Field record: the newest two "proof-strip" videos, each linking to its
+  // related post when one is set.
+  const [firstProof, secondProof] = proof.slice(0, 2).map((video) => ({
+    video,
+    post: posts.find((p) => p._id === video.relatedPostId),
+  }));
 
   const trustLine = [
     ...creds.map((c) =>
@@ -191,7 +240,7 @@ export default async function Home() {
         <div data-field-wrap className="stage-3d mt-14 md:mt-20">
           <div data-field-plane className="relative mx-auto max-w-[110rem]">
             <AerialPlayer
-              src="/video/aerial.mp4"
+              src={aerialSrc}
               poster={images['aerial-fields'].src}
               className="group relative block"
             >
@@ -340,20 +389,9 @@ export default async function Home() {
           lede="Dated work from the land, as it happens. Every entry links to its Farm Update."
         />
         <ol className="mt-20 grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-          {soil ? (
+          {firstProof ? (
             <li data-motion="depth" data-motion-depth="0.2">
-              <VideoCard
-                video={soil}
-                sizes="(min-width: 1024px) 22vw, (min-width: 640px) 50vw, 100vw"
-                showSummary={false}
-                meta={`Soil testing · ${utils.format.date(soil.publishedOn ?? '')}`}
-              />
-              <Link
-                href="/blog/why-we-soil-test-before-planting"
-                className="font-display mt-2 block text-xl leading-snug"
-              >
-                Why every estate is soil-tested before planting
-              </Link>
+              <ProofCard {...firstProof} />
             </li>
           ) : null}
           <li data-motion="depth" data-motion-depth="0.6" className="lg:mt-24">
@@ -377,25 +415,14 @@ export default async function Home() {
               </p>
             </Link>
           </li>
-          {onSite ? (
+          {secondProof ? (
             <li data-motion="depth" data-motion-depth="0.3" className="lg:mt-8">
-              <VideoCard
-                video={onSite}
-                sizes="(min-width: 1024px) 22vw, (min-width: 640px) 50vw, 100vw"
-                showSummary={false}
-                meta={`On site · ${utils.format.date(onSite.publishedOn ?? '')}`}
-              />
-              <Link
-                href="/blog/what-land-backed-means"
-                className="font-display mt-2 block text-xl leading-snug"
-              >
-                What “land-backed” actually means
-              </Link>
+              <ProofCard {...secondProof} />
             </li>
           ) : null}
           <li data-motion="depth" data-motion-depth="0.8" className="lg:mt-36">
             <AerialPlayer
-              src="/video/aerial.mp4"
+              src={aerialSrc}
               poster={images['aerial-fields'].src}
               className="group relative block overflow-hidden"
             >

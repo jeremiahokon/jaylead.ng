@@ -36,10 +36,11 @@ export const templateFor: Record<LeadType, WhatsappTemplateKey> = {
   'plot-enquiry': 'plot',
 };
 
+/** `{hours}` is filled from Site settings → Office hours by the caller. */
 export const successCopy: Record<LeadType, string> = {
   inspection: 'Request received. Tap below to confirm on WhatsApp.',
   contact:
-    'Message received. We reply Monday to Friday, 9am to 5pm. Tap below to continue on WhatsApp.',
+    'Message received. We reply {hours}. Tap below to continue on WhatsApp.',
   realtor:
     'Application received. Our team will contact you within 3 to 5 working days.',
   nysc: 'Request received. We’ll be in touch about placement.',
@@ -48,6 +49,10 @@ export const successCopy: Record<LeadType, string> = {
   newsletter: 'You’re on the list for farm updates.',
   'plot-enquiry': 'Enquiry received. Tap below to continue on WhatsApp.',
 };
+
+/** The success message for a form, with the office hours filled in. */
+export const successMessage = (type: LeadType, hours: string) =>
+  successCopy[type].replace('{hours}', hours);
 
 export type FormState = {
   status: 'idle' | 'ok' | 'error';

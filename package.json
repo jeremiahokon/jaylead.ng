@@ -14,13 +14,11 @@
     "fix": "pnpm run format && pnpm run lint:fix",
     "prepare": "husky",
     "test": "vitest run",
-    "assets": "tsx scripts/process-assets.mts",
     "og": "bash scripts/render-og.sh",
-    "fonts": "sh scripts/build-fonts.sh",
     "check:copy": "node scripts/check-copy.mjs",
     "verify": "pnpm test && pnpm build && pnpm check:copy",
     "seed": "node --env-file-if-exists=.env.local --import tsx scripts/seed.mts",
-    "logo": "bash scripts/trace-logo.sh"
+    "webhook:test": "node --env-file-if-exists=.env.local scripts/test-revalidate.mjs"
   },
   "dependencies": {
     "@portabletext/react": "^8.0.1",
