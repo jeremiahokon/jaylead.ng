@@ -64,6 +64,7 @@ export function VideoPlayer({
         ref={dialog}
         className="reel-dialog m-auto"
         aria-label={label}
+        data-lenis-prevent
         onClose={() => {
           clearTimeout(timer.current);
           setOpen(false);

@@ -31,7 +31,7 @@ export function YearsScene({ heading }: { heading: ReactNode }) {
         aria-labelledby="years-title"
         className="on-ink bg-ink text-bone grain relative overflow-hidden"
       >
-        <div className="flex min-h-svh flex-col justify-between gap-10 py-16 md:py-20">
+        <div className="flex min-h-svh flex-col justify-between gap-10 pt-28 pb-16 md:py-20">
           <div className="mx-auto flex w-full max-w-[96rem] items-end justify-between gap-8 px-(--gutter)">
             <h2
               id="years-title"
@@ -41,12 +41,12 @@ export function YearsScene({ heading }: { heading: ReactNode }) {
             </h2>
             <p
               aria-hidden
-              className="font-display tabular text-oil-light hidden text-right leading-none md:block"
+              className="font-display tabular text-oil-light shrink-0 text-right leading-none"
             >
               <span className="micro text-sand block">Year</span>
               <span
                 data-years-count
-                className="block text-[clamp(5rem,12vw,12rem)]"
+                className="block text-[clamp(4rem,12vw,12rem)]"
               >
                 0
               </span>

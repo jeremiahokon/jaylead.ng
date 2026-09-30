@@ -41,7 +41,7 @@ export function AerialPlayer({
       </a>
       <dialog
         ref={dialog}
-        className="aerial-dialog m-0 h-svh max-h-none w-screen max-w-none"
+        className="aerial-dialog fixed inset-0 m-0 h-full max-h-none w-full max-w-none"
         aria-label="Aerial view of Jaylead farmland"
         onClose={() => {
           setOpen(false);
@@ -51,10 +51,11 @@ export function AerialPlayer({
           if (e.target === e.currentTarget) close();
         }}
       >
-        {/* A full-screen sheet: the clip centred edge to edge, the caption
-            centred under it, Close pinned top-right within thumb reach. */}
+        {/* A full-screen sheet sized to the screen, not 100vw: the clip
+            centred with a gutter each side, the caption under it, Close
+            pinned top-right within thumb reach. */}
         <div
-          className="flex h-full w-full flex-col items-center justify-center gap-5 px-0 py-20 sm:px-6"
+          className="flex h-full w-full flex-col items-center justify-center gap-5 px-4 py-20 sm:px-6"
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
           }}
@@ -67,7 +68,7 @@ export function AerialPlayer({
           >
             Close
           </button>
-          <div className="bg-ink aspect-video w-full max-w-6xl overflow-hidden sm:rounded-sm">
+          <div className="bg-ink aspect-video w-full max-w-[min(72rem,calc((100dvh_-_13rem)*16/9))] overflow-hidden rounded-sm">
             {open ? (
               <video
                 src={src}
