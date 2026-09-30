@@ -179,6 +179,17 @@ export async function SiteFooter() {
           <p>
             © {year} {s.legalName}. RC {s.rcNumber}. All rights reserved.
           </p>
+          <p>
+            Built by{' '}
+            <a
+              href="https://jeremiahokon.online"
+              target="_blank"
+              rel="noopener"
+              className="link-under text-bone"
+            >
+              Jeremiah Okon
+            </a>
+          </p>
           <p className="tabular">2 + 2 = 22: our partnership maths</p>
         </div>
       </div>
