@@ -71,6 +71,13 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Safety net: nothing may widen the page sideways. On phones a wider page
+     widens the layout viewport, which also drags fixed dialogs off-screen. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     background: var(--color-bone);
     font-size: var(--text-body);
@@ -379,7 +386,8 @@
     both;
 }
 
-html:has(.mobile-menu[open]) {
+html:has(.mobile-menu[open]),
+html:has(dialog.reel-dialog[open], dialog.aerial-dialog[open]) {
   overflow: hidden;
 }
 
@@ -399,8 +407,9 @@ html:has(.mobile-menu[open]) {
 /* ── Video facades ─────────────────────────────────────────────────── */
 .reel-frame {
   --embed-h: 84svh;
+  /* Instagram wants 326px, but never wider than the screen minus a gutter. */
   --embed-w: clamp(
-    20.375rem,
+    min(20.375rem, 100vw - 2.5rem),
     min(92vw, (var(--embed-h) - 208px) / 1.25),
     33.75rem
   );
@@ -429,9 +438,22 @@ dialog.aerial-dialog {
   background: transparent;
 }
 
+/* A tall reel on a short screen (a phone held sideways) scrolls inside the
+   dialog instead of pushing Close off the top. */
+dialog.reel-dialog {
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 dialog.reel-dialog::backdrop,
 dialog.aerial-dialog::backdrop {
   background: color-mix(in oklab, var(--color-ink) 94%, transparent);
+}
+
+/* Rows that slide in from the side start off the edge; clip them there. */
+[data-motion='slide'] {
+  overflow-x: clip;
 }
 
 /* ── Load choreography: pure CSS, plays with JS off ─────────────────── */
