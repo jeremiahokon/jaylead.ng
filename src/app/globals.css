@@ -377,6 +377,14 @@
 
 /* ── Header ────────────────────────────────────────────────────────── */
 /* Mobile menu: a <details> panel below the header, CSS only. */
+/* The panel is pinned at --header-h from the top, so the header must sit at
+   the very top while it is open. The announcement bar above the header would
+   push it down and the panel would cover half of it: hide the bar meanwhile
+   (the jump happens behind the panel). */
+html:has(.mobile-menu[open]) .announcement-bar {
+  display: none;
+}
+
 .mobile-menu[open] > .mobile-menu-panel {
   animation: menu-in 700ms var(--ease-out-expo) both;
 }
@@ -562,6 +570,103 @@ dialog.aerial-dialog::backdrop {
 
 [data-field-armed] [data-field-plane] figure > div {
   aspect-ratio: auto !important;
+}
+
+/* Enquiry form (components/lead-form). Questions number themselves, so a
+   hidden question leaves no gap. Which questions show is decided here from
+   the checked answer, so it works without JavaScript. */
+[data-enquiry] {
+  counter-reset: q;
+}
+
+[data-enquiry] [data-q] {
+  counter-increment: q;
+}
+
+.enquiry-legend {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.1rem + 0.9vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.enquiry-legend::before {
+  content: counter(q, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-sans, inherit);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--color-oil);
+}
+
+[data-enquiry]:has([data-not-buying]:checked) [data-buying],
+[data-enquiry] [data-visiting] {
+  display: none;
+}
+
+[data-enquiry]:has([data-visit]:checked) [data-visiting] {
+  display: block;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.5rem 1.15rem;
+  border: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+  border-radius: 999px;
+  font-size: 1rem;
+  line-height: 1.25;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 160ms var(--ease-out-expo, ease-out),
+    border-color 160ms var(--ease-out-expo, ease-out),
+    color 160ms var(--ease-out-expo, ease-out),
+    transform 120ms ease-out;
+}
+
+.chip:hover {
+  border-color: currentColor;
+}
+
+.chip:active {
+  transform: scale(0.97);
+}
+
+.chip:has(:checked) {
+  background: var(--color-oil);
+  border-color: var(--color-oil);
+  color: var(--color-bone);
+}
+
+.chip:has(:focus-visible) {
+  outline: 1.5px solid var(--color-oil);
+  outline-offset: 3px;
+}
+
+/* An answered question drops its error at once, before any resubmit. */
+fieldset[aria-invalid='true']:not(:has(:checked)) .chip {
+  border-color: var(--color-alert);
+}
+
+fieldset:has(:checked) > [data-err] {
+  display: none;
+}
+
+/* Phones: no field scene. The aerial stands upright under the copy, one
+   full screen tall, and scrolls with the page. */
+@media (max-width: 47.99rem) {
+  [data-field-wrap] [data-field-plane] a,
+  [data-field-wrap] [data-field-plane] figure {
+    height: 100svh;
+  }
+
+  [data-field-wrap] [data-field-plane] figure > div {
+    height: 100%;
+    aspect-ratio: auto !important;
+  }
 }
 
 /* 3D stages: flat by default; scenes add the depth on the client. */

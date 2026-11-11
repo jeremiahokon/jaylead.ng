@@ -94,7 +94,7 @@ export default async function Nysc() {
 
       <Marquee items={departments.map((d) => d.name)} />
 
-      <section className="mx-auto grid max-w-[96rem] gap-16 px-(--gutter) py-28 md:grid-cols-2 md:py-40">
+      <section className="mx-auto grid max-w-384 gap-16 px-(--gutter) py-28 md:grid-cols-2 md:py-40">
         <div>
           <SectionHead
             index="01"
@@ -158,7 +158,7 @@ export default async function Nysc() {
       </section>
 
       <section id="placement" className="bg-bone-deep">
-        <div className="mx-auto grid max-w-[96rem] gap-16 px-(--gutter) py-28 md:grid-cols-2 md:py-40">
+        <div className="mx-auto grid max-w-384 gap-16 px-(--gutter) py-28 md:grid-cols-2 md:py-40">
           <SectionHead
             index="03"
             eyebrow="Placement"
@@ -169,9 +169,9 @@ export default async function Nysc() {
             }
           />
           <LeadForm
-            type="nysc"
             submitLabel="Send my request"
             sourcePage="/nysc"
+            defaults={{ goal: 'NYSC placement' }}
           />
         </div>
       </section>

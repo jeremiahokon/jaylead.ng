@@ -1,8 +1,9 @@
 'use server';
 
 /**
- * Saves every form submission as a `lead` document in Sanity (brief 11) and
- * hands the visitor to WhatsApp with the same details. Works without
+ * Saves every form submission as a `lead` document in Sanity, where it lands
+ * on the Leads board as "New", emails the team when Resend is configured,
+ * and hands the visitor to WhatsApp with a message matching their answer. Works without
  * JavaScript: the form posts normally and, when the client flag is absent,
  * the action redirects to /thank-you carrying the WhatsApp link.
  *
@@ -16,11 +17,12 @@ import { redirect } from 'next/navigation';
 import { getSettings } from '@/lib/content';
 import {
   type FormState,
+  type Goal,
   type LeadType,
   leadTypes,
   schemas,
   successMessage,
-  templateFor,
+  whatsappFor,
 } from '@/lib/forms/schema';
 import { utils } from '@/lib/utils';
 
@@ -42,7 +44,7 @@ function limited(ip: string) {
 const hoursText = async () =>
   utils.format.hours((await getSettings()).officeHours);
 
-async function notify(type: LeadType, data: Record<string, string>) {
+async function notify(data: Record<string, string | undefined>) {
   const key = process.env.RESEND_API_KEY;
   const to = process.env.LEAD_NOTIFY_EMAIL;
 
@@ -62,7 +64,7 @@ async function notify(type: LeadType, data: Record<string, string>) {
     body: JSON.stringify({
       from: 'Jaylead website <onboarding@resend.dev>',
       to: [to],
-      subject: `New ${type} lead: ${data.name ?? data.email ?? ''}`,
+      subject: `New lead: ${data.goal ?? 'Farm updates'}, ${data.name ?? data.email ?? ''}`,
       text: body,
     }),
   }).catch((e) => console.error('[lead] email failed', e));
@@ -115,15 +117,17 @@ export async function submitLead(
     };
   }
 
-  const data = parsed.data as Record<string, string>;
-
+  const data = parsed.data as Record<string, string | undefined>;
+  const goal = data.goal as Goal | undefined;
   const settings = await getSettings();
 
-  const wa = utils.contact.whatsappHref(settings, templateFor[type], {
+  const { key, plot } = whatsappFor(goal, data.landSize);
+
+  const wa = utils.contact.whatsappHref(settings, key, {
     date: data.preferredDate
       ? utils.format.date(data.preferredDate)
       : undefined,
-    plot: data.plot || undefined,
+    plot,
   });
 
   const client = writeClient();
@@ -132,37 +136,25 @@ export async function submitLead(
     await client
       .create({
         _type: 'lead',
-        type:
-          type === 'contact' && data.interest?.startsWith('Investing: Option A')
-            ? 'invest-a'
-            : type === 'contact' &&
-                data.interest?.startsWith('Investing: Option B')
-              ? 'invest-b'
-              : type,
         status: 'new',
+        goal: goal ?? 'Farm updates sign-up',
+        landSize: data.landSize,
+        timeline: data.timeline,
+        basedIn: data.basedIn,
         name: data.name,
         phone: data.phone,
-        email: data.email,
-        location: data.location,
+        email: data.email || undefined,
         preferredDate: data.preferredDate || undefined,
-        plot: data.plot,
-        interest: data.interest,
-        message: data.message,
-        experience: data.experience
-          ? `${data.experience}${data.experienceDetail ? `: ${data.experienceDetail}` : ''}`
-          : undefined,
+        message: data.message || undefined,
         sourcePage: raw.sourcePage,
         createdAt: new Date().toISOString(),
       })
       .catch((e) => console.error('[lead] Sanity write failed', e));
   } else {
-    console.warn(
-      '[lead] Sanity not configured; lead handed to WhatsApp only',
-      type
-    );
+    console.warn('[lead] Sanity not configured; lead handed to WhatsApp only');
   }
 
-  await notify(type, data);
+  await notify({ ...data, page: raw.sourcePage });
 
   if (!withJs)
     redirect(

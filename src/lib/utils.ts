@@ -209,12 +209,21 @@ const contact = {
   telHref: (e164: string) => `tel:${e164.replace(/[^\d+]/g, '')}`,
 
   /**
-   * Nigerian phone numbers in the forms (brief 11): accepts 0803 123 4567,
-   * 803 123 4567, +234 803 123 4567 and 234803..., and returns E.164
-   * (+2348031234567), or null when it can't be a Nigerian number.
+   * Phone numbers in the forms (brief 11). Nigerian numbers in any common
+   * form (0803 123 4567, 803 123 4567, +234 803 123 4567, 234803...) become
+   * E.164 (+2348031234567). A number written with + or 00 and another
+   * country code (diaspora buyers) is kept as international E.164. Returns
+   * null when it can't be a phone number.
    */
   normalisePhone(input: string): string | null {
-    const digits = input.replace(/[^\d+]/g, '').replace(/^\+/, '');
+    const raw = input.trim();
+    const intl = /^(\+|00)/.test(raw);
+    const all = raw.replace(/\D/g, '');
+    const digits = intl ? all.replace(/^00/, '') : all;
+
+    if (intl && !digits.startsWith('234'))
+      return /^[1-9]\d{7,14}$/.test(digits) ? `+${digits}` : null;
+
     let local: string;
 
     if (digits.startsWith('234')) local = digits.slice(3);

@@ -173,9 +173,9 @@ export default async function Realtor() {
             size="title"
           />
           <LeadForm
-            type="realtor"
             submitLabel="Send my application"
             sourcePage="/become-a-realtor"
+            defaults={{ goal: 'Become a realtor' }}
             className="mt-10"
           />
         </div>

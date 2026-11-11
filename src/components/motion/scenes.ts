@@ -4,8 +4,10 @@
  * JavaScript, or with reduced motion, the markup is already complete: the
  * field is a flat full-width photo, the years are a swipeable rail.
  *
- * Both run on phones as well as desktop (the owner's call), with shorter
- * scroll distances on small screens.
+ * The years rail runs on phones too (the owner's call), with a shorter
+ * scroll distance. The field scene is desktop only: on phones the aerial
+ * stands upright and full-screen under the copy and simply scrolls (owner's
+ * call, November 2026).
  */
 import type { Conditions, PluginName, Tools } from './effects';
 
@@ -35,7 +37,7 @@ export const scenes = {
   field: {
     plugins: [],
     run(el, { gsap }, c) {
-      if (c.reduce) return;
+      if (c.reduce || !c.desktop) return;
       const copy = el.querySelector<HTMLElement>('[data-field-copy]');
       const plane = el.querySelector<HTMLElement>('[data-field-plane]');
       const veil = el.querySelector<HTMLElement>('[data-field-veil]');
@@ -44,7 +46,7 @@ export const scenes = {
       if (!copy || !plane) return;
 
       el.dataset.fieldArmed = '';
-      const tilt = c.desktop ? 73 : 78;
+      const tilt = 73;
       const PERSPECTIVE = 1400; // matches .stage-3d
 
       /**
@@ -74,7 +76,7 @@ export const scenes = {
         scrollTrigger: {
           trigger: el,
           start: 'top top',
-          end: () => `+=${innerHeight * (c.desktop ? 1.3 : 0.9)}`,
+          end: () => `+=${innerHeight * 1.3}`,
           pin: true,
           pinSpacer: spacer(el),
           scrub: 0.9,

@@ -57,10 +57,17 @@ export default async function Privacy() {
       </p>
       <h2>Cookies and tracking</h2>
       <p>
-        This website uses no tracking or advertising cookies and no analytics.
-        Videos from Instagram, TikTok or YouTube do not load until you tap to
-        play one; once you do, that platform may set its own cookies under its
-        own privacy policy.
+        We use Google Analytics to understand how visitors use this website, and
+        the Meta Pixel to measure how well our Facebook and Instagram adverts
+        work and to show our adverts to people likely to be interested. These
+        tools set cookies and record the pages you visit, and whether you sent
+        us an enquiry or tapped to message us on WhatsApp. They do not receive
+        your name, phone number or the contents of any form. You can block these
+        cookies in your browser settings, opt out of Google Analytics at
+        tools.google.com/dlpage/gaoptout, and manage advert preferences in your
+        Facebook or Instagram settings. Videos from Instagram, TikTok or YouTube
+        do not load until you tap to play one; once you do, that platform may
+        set its own cookies under its own privacy policy.
       </p>
       <h2>Your rights</h2>
       <p>

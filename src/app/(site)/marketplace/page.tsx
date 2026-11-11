@@ -409,9 +409,8 @@ export default async function Marketplace() {
           <div className="md:self-end">
             <p className="font-display text-title">Want a call back?</p>
             <LeadForm
-              type="brochure-callback"
-              submitLabel="Call me back"
               sourcePage="/marketplace"
+              defaults={{ goal: 'Own a plot' }}
               className="mt-8"
             />
           </div>
