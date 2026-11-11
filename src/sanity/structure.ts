@@ -2,8 +2,8 @@
  * The Studio desk, organised by page: each page lists exactly the documents
  * that feed it, in the order they appear, so an editor can answer "what can
  * I change on this page?" from the sidebar. Everything is also listed once
- * by type under "All content", and leads sit at the bottom, newest first,
- * with one list per enquiry type for the WhatsApp follow-ups.
+ * by type under "All content", and leads sit at the bottom as one board:
+ * New, Contacted, Closed, newest first.
  *
  * Keep in step with the routes in src/app/(site) and with
  * src/sanity/presentation.ts. Filtered lists create documents through the
@@ -17,19 +17,6 @@ import type {
 } from 'sanity/structure';
 
 import type { FaqGroup, VideoPlacement } from '@/lib/types';
-
-const leadTypes: [string, string][] = [
-  ['plot-enquiry', 'Plot enquiries'],
-  ['inspection', 'Site inspections'],
-  ['invest-a', 'Invest: Option A'],
-  ['invest-b', 'Invest: Option B'],
-  ['realtor', 'Realtor applications'],
-  ['nysc', 'NYSC'],
-  ['contact', 'Contact form'],
-  ['media', 'Media'],
-  ['brochure-callback', 'Brochure call-backs'],
-  ['newsletter', 'Farm updates sign-ups'],
-];
 
 /** Structure ids allow letters, digits, - and _ only (no "/" or spaces). */
 const idOf = (text: string) =>
@@ -203,8 +190,30 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .title('Leads')
             .items([
+              ...(
+                [
+                  ['new', 'New: reply to these'],
+                  ['contacted', 'Contacted'],
+                  ['closed', 'Closed'],
+                ] as const
+              ).map(([status, title]) =>
+                S.listItem()
+                  .title(title)
+                  .id(`leads-${status}`)
+                  .child(
+                    S.documentList()
+                      .title(title)
+                      .filter('_type == "lead" && status == $status')
+                      .params({ status })
+                      .defaultOrdering([
+                        { field: 'createdAt', direction: 'desc' },
+                      ])
+                  )
+              ),
+              S.divider(),
               S.listItem()
                 .title('All leads, newest first')
+                .id('leads-all')
                 .child(
                   S.documentTypeList('lead')
                     .title('All leads')
@@ -212,30 +221,6 @@ export const structure: StructureResolver = (S) =>
                       { field: 'createdAt', direction: 'desc' },
                     ])
                 ),
-              S.listItem()
-                .title('New (not yet contacted)')
-                .child(
-                  S.documentList()
-                    .title('New leads')
-                    .filter('_type == "lead" && status == "new"')
-                    .defaultOrdering([
-                      { field: 'createdAt', direction: 'desc' },
-                    ])
-                ),
-              S.divider(),
-              ...leadTypes.map(([type, title]) =>
-                S.listItem()
-                  .title(title)
-                  .child(
-                    S.documentList()
-                      .title(title)
-                      .filter('_type == "lead" && type == $type')
-                      .params({ type })
-                      .defaultOrdering([
-                        { field: 'createdAt', direction: 'desc' },
-                      ])
-                  )
-              ),
             ])
         ),
     ]);

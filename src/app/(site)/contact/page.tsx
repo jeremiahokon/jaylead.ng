@@ -174,43 +174,28 @@ export default async function Contact() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[96rem] gap-20 px-(--gutter) py-28 md:grid-cols-2 md:py-40">
-        <div>
+      <section
+        id="inspection"
+        className="mx-auto grid max-w-[96rem] gap-14 px-(--gutter) py-28 md:grid-cols-[1fr_1.3fr] md:gap-20 md:py-40"
+      >
+        <div className="md:sticky md:top-28 md:self-start">
           <SectionHead
             index="02"
             eyebrow="Prefer to write?"
-            title="Send us a message."
-            size="title"
-          />
-          <LeadForm
-            type="contact"
-            submitLabel="Send message"
-            sourcePage="/contact"
-            className="mt-10"
-          />
-        </div>
-        <div id="inspection">
-          <SectionHead
-            index="03"
-            eyebrow="See the land"
             title={
               <>
-                Book a site <span className="em-oil">inspection.</span>
+                Tell us what <span className="em-oil">you’re after.</span>
               </>
             }
+            lede="Four quick taps, then your number. To book a site inspection, choose “Visit the farm”."
             size="title"
           />
-          <LeadForm
-            type="inspection"
-            submitLabel="Request an inspection"
-            sourcePage="/contact"
-            className="mt-10"
-          />
         </div>
+        <LeadForm sourcePage="/contact" />
       </section>
 
       <FaqSection
-        index="04"
+        index="03"
         title="Visiting, paying and trust."
         items={visitFaqs}
         withPaymentSafety

@@ -154,6 +154,20 @@ describe('utils.contact', () => {
     );
   });
 
+  it('normalises Nigerian and international phone numbers', () => {
+    const n = utils.contact.normalisePhone;
+
+    expect(n('0803 123 4567')).toBe('+2348031234567');
+    expect(n('803 123 4567')).toBe('+2348031234567');
+    expect(n('+234 803 123 4567')).toBe('+2348031234567');
+    expect(n('00234 803 123 4567')).toBe('+2348031234567');
+    expect(n('+44 7700 900123')).toBe('+447700900123');
+    expect(n('001 415 555 0134')).toBe('+14155550134');
+    expect(n('12345')).toBeNull();
+    expect(n('+44 12')).toBeNull();
+    expect(n('hello')).toBeNull();
+  });
+
   it('drops an unfilled date phrase cleanly', () => {
     expect(
       utils.contact.fillTemplate(

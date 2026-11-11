@@ -248,12 +248,13 @@ export const effects = {
 
   /**
    * 3D card entrance: each child swings up from a tilted plane, like a page
-   * of the register being laid down.
+   * of the register being laid down. Desktop only: on phones the perspective
+   * swing reads as a lurch, so children simply fade and rise into place.
    */
   tilt: {
     plugins: [],
     run(els, t, c) {
-      if (c.reduce)
+      if (c.reduce || !c.desktop)
         return revealBatch(
           els.flatMap((el) => [...el.children]),
           t,

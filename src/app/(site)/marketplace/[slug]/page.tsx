@@ -170,7 +170,7 @@ export default async function PlotPage({ params }: Props) {
         </section>
       ) : null}
 
-      <section className="mx-auto grid max-w-[96rem] gap-16 px-(--gutter) pb-24 md:pb-36 lg:grid-cols-[1.3fr_1fr]">
+      <section className="mx-auto grid max-w-384 gap-16 px-(--gutter) pb-24 md:pb-36 lg:grid-cols-[1.3fr_1fr]">
         <div>
           <SectionHead
             index="01"
@@ -214,17 +214,15 @@ export default async function PlotPage({ params }: Props) {
             size="title"
           />
           <LeadForm
-            type="inspection"
-            submitLabel="Request an inspection"
             sourcePage={`/marketplace/${plot.slug}`}
-            defaults={{ plot: plot.sizeLabel }}
+            defaults={{ goal: 'Visit the farm', landSize: plot.sizeLabel }}
             className="mt-10"
           />
         </div>
       </section>
 
       <section className="bg-bone-deep">
-        <div className="mx-auto max-w-[96rem] px-(--gutter) py-24 md:py-36">
+        <div className="mx-auto max-w-384 px-(--gutter) py-24 md:py-36">
           <TrustBlock />
           <div className="mt-16 flex flex-wrap gap-x-10 gap-y-4">
             {estate ? (
@@ -246,7 +244,7 @@ export default async function PlotPage({ params }: Props) {
       </section>
 
       {related.length ? (
-        <section className="mx-auto grid max-w-[96rem] gap-14 px-(--gutter) py-24 md:py-36 lg:grid-cols-[1fr_1.7fr]">
+        <section className="mx-auto grid max-w-384 gap-14 px-(--gutter) py-24 md:py-36 lg:grid-cols-[1fr_1.7fr]">
           <SectionHead index="03" eyebrow="Questions" title="Owning a plot." />
           <FaqList items={related} />
         </section>

@@ -5,6 +5,7 @@
  */
 import { Suspense } from 'react';
 
+import { Analytics } from '@/components/analytics';
 import { DraftPreview } from '@/components/draft-preview';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -31,6 +32,7 @@ export default function SiteLayout({
       <Suspense fallback={null}>
         <DraftPreview />
       </Suspense>
+      <Analytics />
     </>
   );
 }

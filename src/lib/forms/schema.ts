@@ -1,10 +1,19 @@
 /**
- * Server-side validation (zod) for each lead type. Plain constants live in
+ * Server-side validation (zod) for the two forms. Plain constants live in
  * ./fields so the client form never bundles zod.
  */
 import { z } from 'zod';
 
-import { interests, type LeadType } from './fields';
+import { utils } from '@/lib/utils';
+
+import {
+  basedIn,
+  goals,
+  landSizes,
+  type LeadType,
+  nonBuyerGoals,
+  timelines,
+} from './fields';
 
 const name = z.string().trim().min(2, 'Please enter your full name.').max(120);
 
@@ -17,7 +26,8 @@ const phone = z
     if (!e164)
       ctx.addIssue({
         code: 'custom',
-        message: 'Enter a Nigerian phone number, for example 0803 123 4567.',
+        message:
+          'Enter your phone number, for example 0803 123 4567, or +44 7700 900123 from abroad.',
       });
 
     return e164 ?? v;
@@ -28,55 +38,74 @@ const email = z.union([
   z.string().trim().email('That email address doesn’t look right.'),
 ]);
 
-const text = (max: number) => z.string().trim().max(max).optional().default('');
+/** An unanswered radio group is absent from the form data, not "". */
+const choice = <T extends readonly [string, ...string[]]>(
+  options: T,
+  message: string
+) => z.enum(options, { message });
+
+const optionalChoice = <T extends readonly [string, ...string[]]>(options: T) =>
+  z.enum(options).optional();
 
 export const schemas = {
-  inspection: z.object({
-    name,
-    phone,
-    preferredDate: z.string().trim().min(1, 'Choose a preferred date.'),
-    plot: text(80),
-  }),
-  contact: z.object({
-    name,
-    phone,
-    email,
-    interest: z.enum(interests),
-    message: z.string().trim().min(5, 'Please add a short message.').max(2000),
-  }),
-  realtor: z.object({
-    name,
-    phone,
-    email: z.string().trim().email('Enter your email address.'),
-    location: z.string().trim().min(2, 'Enter your city and state.').max(120),
-    experience: z.enum(['yes', 'no']),
-    experienceDetail: text(400),
-    message: z.string().trim().min(5, 'Tell us briefly why.').max(1000),
-  }),
-  nysc: z.object({
-    name,
-    phone,
-    email,
-    location: text(120),
-    message: text(1000),
-  }),
-  'brochure-callback': z.object({ name, phone }),
+  enquiry: z
+    .object({
+      goal: choice(goals, 'Choose what brings you here.'),
+      landSize: optionalChoice(landSizes),
+      timeline: optionalChoice(timelines),
+      basedIn: choice(basedIn, 'Tell us where you are based.'),
+      name,
+      phone,
+      email,
+      preferredDate: z
+        .union([
+          z.literal(''),
+          z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date.'),
+        ])
+        .optional()
+        .default(''),
+      message: z.string().trim().max(2000).optional().default(''),
+    })
+    .superRefine(
+      (d, ctx) => {
+        if (nonBuyerGoals.includes(d.goal)) return;
+        if (!d.landSize)
+          ctx.addIssue({
+            code: 'custom',
+            path: ['landSize'],
+            message: 'Choose a size, or “Not sure yet”.',
+          });
+        if (!d.timeline)
+          ctx.addIssue({
+            code: 'custom',
+            path: ['timeline'],
+            message: 'Choose a time, or “Just exploring”.',
+          });
+      },
+      // Run even when other fields fail, so every unanswered question is
+      // flagged on the first submit. Only goal, landSize and timeline are read.
+      { when: () => true }
+    )
+    // Drop answers the chosen goal hides: land and timing mean nothing for
+    // a realtor or NYSC enquiry (a page may have preselected them), and a
+    // visit date only counts for a visit.
+    .transform((d) => ({
+      ...d,
+      ...(nonBuyerGoals.includes(d.goal)
+        ? { landSize: undefined, timeline: undefined }
+        : {}),
+      preferredDate: d.goal === 'Visit the farm' ? d.preferredDate : '',
+    })),
   newsletter: z.object({
     email: z.string().trim().email('Enter your email address.'),
-  }),
-  'plot-enquiry': z.object({
-    name,
-    phone,
-    plot: text(80),
-    message: text(1000),
   }),
 } satisfies Record<LeadType, z.ZodType>;
 
 export {
   type FormState,
+  type Goal,
   type LeadType,
   leadTypes,
   successMessage,
-  templateFor,
+  whatsappFor,
 } from './fields';
-import { utils } from '@/lib/utils';

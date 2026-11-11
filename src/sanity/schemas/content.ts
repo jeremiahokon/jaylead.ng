@@ -278,46 +278,108 @@ export const videoEmbed = defineType({
   preview: { select: { title: 'title', subtitle: 'url', media: 'poster' } },
 });
 
+/**
+ * One document per form submission, written by app/actions/lead.ts. Every
+ * page uses the same enquiry form, so every lead has the same shape: the
+ * four answers, then the contact details. The team works the Leads board by
+ * moving `status` from New to Contacted to Closed.
+ */
+const legacy = (name: string, type = 'string') =>
+  defineField({
+    name,
+    type,
+    readOnly: true,
+    // Only leads from before the single enquiry form have these.
+    hidden: ({ value }) => !value,
+    fieldset: 'legacy',
+  });
+
 export const lead = defineType({
   name: 'lead',
   title: 'Lead',
   type: 'document',
+  // No draft and Publish step: ticking a status saves at once, so moving a
+  // lead from New to Contacted is one tap.
+  liveEdit: true,
+  fieldsets: [
+    {
+      name: 'legacy',
+      title: 'From the old forms',
+      options: { collapsible: true, collapsed: true },
+    },
+  ],
   fields: [
-    defineField({
-      name: 'type',
-      type: 'string',
-      options: {
-        list: [
-          'plot-enquiry',
-          'inspection',
-          'invest-a',
-          'invest-b',
-          'realtor',
-          'nysc',
-          'contact',
-          'media',
-          'brochure-callback',
-          'newsletter',
-        ],
-      },
-    }),
     defineField({
       name: 'status',
       type: 'string',
-      options: { list: ['new', 'contacted', 'closed'] },
+      description: 'Move to Contacted once you have replied.',
+      options: {
+        list: [
+          { title: 'New', value: 'new' },
+          { title: 'Contacted', value: 'contacted' },
+          { title: 'Closed', value: 'closed' },
+        ],
+        layout: 'radio',
+        direction: 'horizontal',
+      },
       initialValue: 'new',
     }),
+    defineField({
+      name: 'goal',
+      title: 'What brings them here',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'landSize',
+      title: 'How much land',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'timeline',
+      title: 'When to start',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'basedIn',
+      title: 'Based',
+      type: 'string',
+      readOnly: true,
+    }),
     defineField({ name: 'name', type: 'string', readOnly: true }),
-    defineField({ name: 'phone', type: 'string', readOnly: true }),
+    defineField({
+      name: 'phone',
+      title: 'Phone / WhatsApp',
+      type: 'string',
+      readOnly: true,
+    }),
     defineField({ name: 'email', type: 'string', readOnly: true }),
-    defineField({ name: 'location', type: 'string', readOnly: true }),
-    defineField({ name: 'preferredDate', type: 'date', readOnly: true }),
-    defineField({ name: 'plot', type: 'string', readOnly: true }),
-    defineField({ name: 'interest', type: 'string', readOnly: true }),
+    defineField({
+      name: 'preferredDate',
+      title: 'Preferred visit date',
+      type: 'date',
+      readOnly: true,
+    }),
     defineField({ name: 'message', type: 'text', readOnly: true }),
-    defineField({ name: 'experience', type: 'string', readOnly: true }),
-    defineField({ name: 'sourcePage', type: 'string', readOnly: true }),
-    defineField({ name: 'createdAt', type: 'datetime', readOnly: true }),
+    defineField({
+      name: 'sourcePage',
+      title: 'Sent from page',
+      type: 'string',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'createdAt',
+      title: 'Received',
+      type: 'datetime',
+      readOnly: true,
+    }),
+    legacy('type'),
+    legacy('location'),
+    legacy('plot'),
+    legacy('interest'),
+    legacy('experience'),
   ],
   orderings: [
     {
@@ -329,13 +391,26 @@ export const lead = defineType({
   preview: {
     select: {
       name: 'name',
+      email: 'email',
+      goal: 'goal',
       type: 'type',
+      landSize: 'landSize',
       status: 'status',
       createdAt: 'createdAt',
     },
-    prepare: ({ name, type, status, createdAt }) => ({
-      title: `${name ?? 'Unnamed'} (${type ?? 'lead'})`,
-      subtitle: `${status ?? 'new'} · ${createdAt ? new Date(createdAt).toLocaleString('en-GB') : ''}`,
+    prepare: ({ name, email, goal, type, landSize, status, createdAt }) => ({
+      title: `${name ?? email ?? 'Unnamed'} · ${goal ?? type ?? 'lead'}`,
+      subtitle: [
+        status === 'new'
+          ? '● New'
+          : status === 'contacted'
+            ? 'Contacted'
+            : 'Closed',
+        landSize,
+        createdAt ? new Date(createdAt).toLocaleString('en-GB') : '',
+      ]
+        .filter(Boolean)
+        .join(' · '),
     }),
   },
 });

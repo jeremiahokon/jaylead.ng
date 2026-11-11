@@ -29,7 +29,7 @@ export async function SiteHeader() {
   return (
     <>
       {bar ? (
-        <div className="bg-ink text-bone micro px-(--gutter) py-2.5 text-center">
+        <div className="announcement-bar bg-ink text-bone micro px-(--gutter) py-2.5 text-center">
           {bar.link ? (
             <Link href={bar.link} className="link-draw">
               {bar.text}
